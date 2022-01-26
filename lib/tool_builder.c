@@ -69,7 +69,7 @@ static inline struct command_d *find_command(const struct command_d **commands, 
 
 int execute_command(int argc, char **argv, const struct builder_d *c_builder)
 {
-	if (c_builder == NULL || c_builder->b_commands == NULL
+	if (c_builder == NULL || c_builder->b_commands == NULL ||
 	    c_builder->b_help_message == NULL)
 	{
 		return BUILDER_IS_NOT_INITIALIZED;

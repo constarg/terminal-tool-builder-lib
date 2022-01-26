@@ -9,13 +9,9 @@ ADD_LIBRARY(
 		toolbuilder STATIC
 		lib/tool_builder.c
 		include/tool_builder.h
-		tools/parser.c
-		tools/include/parser.h		
 	   )
 
 include_directories(
         	include/
-		misc/include/
-		tools/include/
 )
 
