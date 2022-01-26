@@ -1,12 +1,20 @@
 #ifndef TOOL_BUILDER_H
 #define TOOL_BUILDER_H
 
-#include <mallo.h>
+#include <malloc.h>
+
+#define TOOL_BUILDER_V 	1.0
+
+struct exec_info {
+	char c_name[256];					// The name of the command that has been executed.
+	char c_used_alias[256];					// The alias that has been used.
+	char **c_values;					// The values that the been retrieved. Must be freed when there is no more use.
+};
 
 struct command_d {
-	char c_name[256];				// The name of the command.
-	int c_argc;					// How many argcs the command require.
-	char c_alias[256][5];				// The alias of the commnad. 5 is the maximum number of alias.
+	char c_name[256];					// The name of the command.
+	int c_argc;						// How many argcs the command require.
+	char c_alias[256][5];					// The alias of the commnad. 5 is the maximum number of alias.
 	/**
 		This callback is user defined and is executed
 		when the user request a call of the specific
@@ -15,12 +23,12 @@ struct command_d {
 		retrieved from the terminal when the command
 		was called.
 	*/
-	void *(*c_call_back)(const char *value);	// The action to take when the command has been requested.
+	void (*c_call_back)(const struct exec_info *info);	// The action to take when the command has been requested.
 };
 
 struct builder_d {
-	struct command_d *commands;
-	// TODO - Add help struct.
+	struct command_d **commands;				// Null terminated array of commands.
+	char *help_message;					// Help message.
 };
 
 
@@ -44,10 +52,30 @@ static inline void initialize_builder(struct builder_d *c_builder)
 	Free the memory that has been allocated for the builder.
 	@param c_builder The builder to destroy.
 */
-static inline destroy_builder(struct builder_d *c_builder)
+static inline void destroy_builder(struct builder_d *c_builder)
 {
+	// Free commands.
+	for (int c = 0; c_builder->commands[c]; c++) free(c_builder->commands[c]);
+	free(c_builder->commands);
+	c_builder->commands = NULL;
+
+	free(c_builder->help_message);
+	
 	free(c_builder);
 	c_builder = NULL;
+}
+
+/**
+	Free the memory that has been allocated for the values
+	that has been retrieved from terminal.
+	@param info The exec informations of the command.
+*/
+static inline void clear_values(struct exec_info *info)
+{
+	for (int i = 0; info->c_values[i]; i++) free(info->c_values[i]);
+
+	free(info->c_values);
+	info = NULL;
 }
 
 /**
@@ -102,7 +130,7 @@ extern void add_help_tool_closing_description(struct builder_d *c_builder, const
 */
 extern void add_command(struct builder_d *c_builder, const char c_name[256], 
 			int c_argc, const char c_alias[256][5], 
-			void *(*c_call_back)(const char *value));
+			void (*c_call_back)(const struct exec_info *info));
 
 
 /**
@@ -112,7 +140,7 @@ extern void add_command(struct builder_d *c_builder, const char c_name[256],
 	@param c_call_back The callback function to set or change with.
 	
 */
-extern void add_action(struct builder_d *c_builder, void *(*c_call_back)(const char *value));
+extern void add_action(struct builder_d *c_builder, void (*c_call_back)(const struct exec_info *info));
 
 
 /**
@@ -121,7 +149,7 @@ extern void add_action(struct builder_d *c_builder, void *(*c_call_back)(const c
 	@param c_builder The builder to add the command.
 	@param command The command to add.
 */
-static inline void add_command(struct builder_d *c_builder, const struct command_d *command) 
+static inline void add_command_easy(struct builder_d *c_builder, const struct command_d *command) 
 {
 	add_command(
 		c_builder,
@@ -139,7 +167,7 @@ static inline void add_command(struct builder_d *c_builder, const struct command
 	@param argv The argv parameter of the main function.
 	@param c_builder The bulder who has the information for each command.
 */
-extern void execute_command(int argc, char **argv, struct builder_d *c_builder);
+extern void execute_command(int argc, char **argv, const struct builder_d *c_builder);
 
 
 
