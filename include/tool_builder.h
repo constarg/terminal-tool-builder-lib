@@ -5,6 +5,16 @@
 
 #define TOOL_BUILDER_V 	1.0
 
+// errors
+#define WRONG_ARG_NUM			-1
+#define WRONG_NAME_OR_ALIAS		-2
+
+#define EMPTY_NAME			-3
+
+#define NO_ACTION_DEFINED		-4
+
+#define FAILED_TO_MAKE_EXEC_INFO	-5
+
 struct exec_info {
 	char c_name[256];					// The name of the command that has been executed.
 	char c_used_alias[256];					// The alias that has been used.
@@ -14,7 +24,7 @@ struct exec_info {
 struct command_d {
 	char c_name[256];					// The name of the command.
 	int c_argc;						// How many argcs the command require.
-	char c_alias[256][5];					// The alias of the commnad. 5 is the maximum number of alias.
+	char c_alias[5][256];					// The alias of the commnad. 5 is the maximum number of alias.
 	/**
 		This callback is user defined and is executed
 		when the user request a call of the specific
@@ -27,8 +37,8 @@ struct command_d {
 };
 
 struct builder_d {
-	struct command_d **commands;				// Null terminated array of commands.
-	char *help_message;					// Help message.
+	struct command_d **b_commands;				// Null terminated array of commands.
+	char *b_help_message;					// Help message.
 };
 
 
@@ -55,11 +65,12 @@ static inline void initialize_builder(struct builder_d *c_builder)
 static inline void destroy_builder(struct builder_d *c_builder)
 {
 	// Free commands.
-	for (int c = 0; c_builder->commands[c]; c++) free(c_builder->commands[c]);
-	free(c_builder->commands);
-	c_builder->commands = NULL;
+	for (int c = 0; c_builder->b_commands[c]; c++) free(c_builder->b_commands[c]);
+	free(c_builder->b_commands);
+	c_builder->b_commands = NULL;
 
-	free(c_builder->help_message);
+	free(c_builder->b_help_message);
+	c_builder->b_help_message = NULL;
 	
 	free(c_builder);
 	c_builder = NULL;
@@ -70,11 +81,12 @@ static inline void destroy_builder(struct builder_d *c_builder)
 	that has been retrieved from terminal.
 	@param info The exec informations of the command.
 */
-static inline void clear_values(struct exec_info *info)
+static inline void clear_exec_info(struct exec_info *info)
 {
 	for (int i = 0; info->c_values[i]; i++) free(info->c_values[i]);
 
 	free(info->c_values);
+	free(info);
 	info = NULL;
 }
 
@@ -129,7 +141,7 @@ extern void add_help_tool_closing_description(struct builder_d *c_builder, const
 	@param c_call_back The callback that is executed then the command is requested.
 */
 extern void add_command(struct builder_d *c_builder, const char c_name[256], 
-			int c_argc, const char c_alias[256][5], 
+			int c_argc, const char c_alias[5][256], 
 			void (*c_call_back)(const struct exec_info *info));
 
 
@@ -166,8 +178,17 @@ static inline void add_command_easy(struct builder_d *c_builder, const struct co
 	@param argc The argc parameter of the main function.
 	@param argv The argv parameter of the main function.
 	@param c_builder The bulder who has the information for each command.
+	@return On success 0 is returned. On error on integer error is returned.
+	Errors can be:
+		Wrong argument number: -1
+		Wrong command name or alias: -2
+		Empty command name: -3
+		No action defined: -4	-> when no call back exists.
+		failed to make exec info
+		
+	each error has a MACRO that can be used in if statements.
 */
-extern void execute_command(int argc, char **argv, const struct builder_d *c_builder);
+int execute_command(int argc, char **argv, const struct builder_d *c_builder);
 
 
 
