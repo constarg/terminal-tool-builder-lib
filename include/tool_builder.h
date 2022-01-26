@@ -56,7 +56,7 @@ struct builder_d {
 static inline void initialize_builder(struct builder_d *c_builder)
 {
 	c_builder = (struct builder_d *) malloc(sizeof(struct builder_d));
-	c_builder->b_commands = (struct command_d **) calloc(1, sizeof(struct command_d));
+	c_builder->b_commands = (struct command_d **) calloc(1, sizeof(struct command_d **));
 	c_builder->b_help_message = (char *) calloc(300, sizeof(char));
 }
 
