@@ -1,6 +1,8 @@
 #ifndef TOOL_BUILDER_H
 #define TOOL_BUILDER_H
 
+#include <mallo.h>
+
 struct command_d {
 	char c_name[256];				// The name of the command.
 	int c_argc;					// How many argcs the command require.
@@ -21,6 +23,32 @@ struct builder_d {
 	// TODO - Add help struct.
 };
 
+
+/**
+	Initialize the builder to be used for the tool.
+	It must be checked if the builder is null. If the builder
+	is null then it means that there is an error on memory.
+	allocation and must stop the flow of the program. When
+	there is no more use of the builder, the destroy_builder
+	function must be collled.
+	@param c_builder The builder.
+*/
+static inline void initialize_builder(struct builder_d *c_builder)
+{
+	c_builder = (struct builder_d *) malloc(sizeof(struct builder_d));
+	if (c_builder == NULL)
+		return;
+}
+
+/**
+	Free the memory that has been allocated for the builder.
+	@param c_builder The builder to destroy.
+*/
+static inline destroy_builder(struct builder_d *c_builder)
+{
+	free(c_builder);
+	c_builder = NULL;
+}
 
 /**
 	Builds a basic help action that prints informations
