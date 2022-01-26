@@ -50,8 +50,10 @@ void add_action(struct builder_d *c_builder, void (*c_call_back)(const struct ex
 
 static inline struct command_d *find_command(const struct command_d **commands, const char *c_name) 
 {
+
 	for (int curr_c = 0; commands[curr_c]; curr_c++)
 	{
+		if (commands[curr_c] == NULL) return NULL;
 		// Check if any of the names in the commands is the c_name.
 		if (!strcmp(commands[curr_c]->c_name, c_name)) return (struct command_d *) commands[curr_c];
 		else
@@ -67,6 +69,12 @@ static inline struct command_d *find_command(const struct command_d **commands, 
 
 int execute_command(int argc, char **argv, const struct builder_d *c_builder)
 {
+	if (c_builder == NULL || c_builder->b_commands == NULL
+	    c_builder->b_help_message == NULL)
+	{
+		return BUILDER_IS_NOT_INITIALIZED;
+	}
+
 	if (argv[1] == NULL) return EMPTY_NAME;
 
 	// Get the requested command to execute.

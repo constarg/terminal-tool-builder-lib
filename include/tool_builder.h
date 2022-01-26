@@ -14,6 +14,8 @@
 #define NO_ACTION_DEFINED		-4
 
 #define FAILED_TO_MAKE_EXEC_INFO	-5
+#define BUILDER_IS_NOT_INITIALIZED	-6
+
 
 struct exec_info {
 	char c_name[256];					// The name of the command that has been executed.
@@ -54,8 +56,8 @@ struct builder_d {
 static inline void initialize_builder(struct builder_d *c_builder)
 {
 	c_builder = (struct builder_d *) malloc(sizeof(struct builder_d));
-	if (c_builder == NULL)
-		return;
+	c_builder->b_commands = (struct command_d **) calloc(1, sizeof(struct command_d));
+	c_builder->b_help_message = (char *) calloc(300, sizeof(char));
 }
 
 /**
@@ -184,7 +186,8 @@ static inline void add_command_easy(struct builder_d *c_builder, const struct co
 		Wrong command name or alias: -2
 		Empty command name: -3
 		No action defined: -4	-> when no call back exists.
-		failed to make exec info
+		failed to make exec info: -5
+		builder is not initiaized: -6
 		
 	each error has a MACRO that can be used in if statements.
 */
