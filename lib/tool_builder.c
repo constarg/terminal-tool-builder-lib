@@ -10,7 +10,7 @@ void initialize_help(struct builder_d *c_builder, const char *tool_name)
 
 }
 
-void add_full_help(struct builder_d *c_builder, const char *help)
+void add_full_help(struct builder_d *c_builder, const struct help_d *t_help)
 {
 
 }
@@ -70,7 +70,7 @@ static inline struct command_d *find_command(const struct command_d **commands, 
 int execute_command(int argc, char **argv, const struct builder_d *c_builder)
 {
 	if (c_builder == NULL || c_builder->b_commands == NULL ||
-	    c_builder->b_help_message == NULL)
+	    c_builder->b_help == NULL)
 	{
 		return BUILDER_IS_NOT_INITIALIZED;
 	}

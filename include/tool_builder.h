@@ -38,9 +38,21 @@ struct command_d {
 	void (*c_call_back)(const struct exec_info *info);	// The action to take when the command has been requested.
 };
 
+struct command_help {
+	char *c_name;						// The name of the command.
+	char *c_alias;						// The alias of the command.
+	char *c_description;					// The description of the command.
+};
+
+struct help_d {
+	char *h_description;					// The description of the help.
+	struct command_help **h_commands;			// The commands of the help.
+	char *h_close_description;				// The closure description.
+};
+
 struct builder_d {
 	struct command_d **b_commands;				// Null terminated array of commands.
-	char *b_help_message;					// Help message.
+	struct help_d *b_help;					// The help of the tool.
 };
 
 
@@ -57,7 +69,7 @@ static inline void initialize_builder(struct builder_d *c_builder)
 {
 	c_builder = (struct builder_d *) malloc(sizeof(struct builder_d));
 	c_builder->b_commands = (struct command_d **) calloc(1, sizeof(struct command_d **));
-	c_builder->b_help_message = (char *) calloc(300, sizeof(char));
+	c_builder->b_help = (struct help_d *) calloc(1, sizeof(struct help_d));
 }
 
 /**
@@ -71,8 +83,13 @@ static inline void destroy_builder(struct builder_d *c_builder)
 	free(c_builder->b_commands);
 	c_builder->b_commands = NULL;
 
-	free(c_builder->b_help_message);
-	c_builder->b_help_message = NULL;
+	// Destroy help.
+	free(c_builder->b_help->h_description);
+	for (int c = 0; c_builder->b_help->h_commands[c]; c++) free(c_builder->b_help->h_commands[c]);
+	free(c_builder->b_help->h_commands);
+	free(c_builder->b_help);
+	c_builder->b_help = NULL;	
+
 	
 	free(c_builder);
 	c_builder = NULL;
@@ -104,10 +121,10 @@ extern void initialize_help(struct builder_d *c_builder, const char *tool_name);
 	Adds user defined format of help.
 	If this function is used. Then the initialize_help
 	function must be ignored.
-	@param help The full help message.
 	@param c_builder The builder to add the help.
+	@param t_help	 The full help.
 */
-extern void add_full_help(struct builder_d *c_builder, const char *help);
+extern void add_full_help(struct builder_d *c_builder, const struct help_d *t_help);
 
 /**
 	Adds description to the help message.
