@@ -3,6 +3,7 @@
 #include <tool_builder.h>
 
 
+static inline struct command_d *find_command(const struct command_d **commands, const char *c_name);
 
 
 void initialize_help(struct builder_d *c_builder, const char *tool_name)
@@ -34,17 +35,41 @@ extern void add_help_tool_closing_description(struct builder_d *c_builder, const
 
 }
 
-
-void add_command(struct builder_d *c_builder, const char c_name[256], int c_argc, const char c_alias[5][256], 
-		 void (*c_call_back)(const struct exec_info *info))
+/**
+	Check if al the elements of the array is valid
+	strings.
+	@param 
+	@return The valid array.
+*/
+static void cleanup_alias(char (*c_alias)[5][256])
 {
 
 }
 
-
-void add_action(struct builder_d *c_builder, void (*c_call_back)(const struct exec_info *info))
+int add_command(struct builder_d *c_builder, const char c_name[256], int c_argc, const char c_alias[5][256], 
+		 void (*c_call_back)(const struct exec_info *info))
 {
+	if (c_builder == NULL) return BUILDER_IS_NOT_INITIALIZED;
 
+	// Allocate memory for the new command.
+	int last_c = c_builder->b_commandsc;
+	struct command_d *new_command = malloc(sizeof(struct command_d));
+	strcpy(new_command->c_name, c_name);
+	// Set the alias. TODO - Check if the string is valid. 	
+
+	// c_builder->b_commands[]
+}
+
+
+int add_action(struct builder_d *c_builder, const char *c_name,
+	       void (*c_call_back)(const struct exec_info *info))
+{
+	if (c_builder == NULL || c_builder->b_commands == NULL) return BUILDER_IS_NOT_INITIALIZED;
+
+	struct command_d *ch_command = find_command((const struct command_d **) c_builder->b_commands, c_name);
+	if (ch_command == NULL) return NO_SUCH_COMMAND_EXISTS;
+
+	ch_command->c_call_back = c_call_back;	// Set the requested callback.
 }
 
 

@@ -16,6 +16,8 @@
 #define FAILED_TO_MAKE_EXEC_INFO	-5
 #define BUILDER_IS_NOT_INITIALIZED	-6
 
+#define NO_SUCH_COMMAND_EXISTS		-7
+
 
 struct exec_info {
 	char c_name[256];					// The name of the command that has been executed.
@@ -52,6 +54,7 @@ struct help_d {
 
 struct builder_d {
 	struct command_d **b_commands;				// Null terminated array of commands.
+	int b_commandsc;					// The number of the commands.
 	struct help_d *b_help;					// The help of the tool.
 };
 
@@ -70,6 +73,7 @@ static inline void initialize_builder(struct builder_d *c_builder)
 	c_builder = (struct builder_d *) malloc(sizeof(struct builder_d));
 	c_builder->b_commands = (struct command_d **) calloc(1, sizeof(struct command_d **));
 	c_builder->b_help = (struct help_d *) calloc(1, sizeof(struct help_d));
+	c_builder->b_commandsc = 0;
 }
 
 /**
@@ -146,8 +150,13 @@ extern void add_help_tool_closing_description(struct builder_d *c_builder, const
 	@param c_argc The arguments of the command.
 	@param c_alias The alias of the command.
 	@param c_call_back The callback that is executed then the command is requested.
+	@return 0 on success or an integer error number on error.
+	errors:
+`		builder is not initialized: -6
+	all the erros are defined as MACROS.
+
 */
-extern void add_command(struct builder_d *c_builder, const char c_name[256], 
+extern int add_command(struct builder_d *c_builder, const char c_name[256], 
 			int c_argc, const char c_alias[5][256], 
 			void (*c_call_back)(const struct exec_info *info));
 
@@ -156,10 +165,17 @@ extern void add_command(struct builder_d *c_builder, const char c_name[256],
 	Set or change the callback function of a specific
 	command.
 	@param c_builder The builder.
+	@param c_name	The name of the command.
 	@param c_call_back The callback function to set or change with.
+	@return 0 on success or an integer error number on error.
+	errors:
+		no such command exists: -7
+`		builder is not initialized: -6
+	all the erros are defined as MACROS.
 	
 */
-extern void add_action(struct builder_d *c_builder, void (*c_call_back)(const struct exec_info *info));
+extern int add_action(struct builder_d *c_builder, const char *c_name, 
+		       void (*c_call_back)(const struct exec_info *info));
 
 
 /**
@@ -168,9 +184,9 @@ extern void add_action(struct builder_d *c_builder, void (*c_call_back)(const st
 	@param c_builder The builder to add the command.
 	@param command The command to add.
 */
-static inline void add_command_easy(struct builder_d *c_builder, const struct command_d *command) 
+static inline int add_command_easy(struct builder_d *c_builder, const struct command_d *command) 
 {
-	add_command(
+	return add_command(
 		c_builder,
 		command->c_name,
 		command->c_argc,
