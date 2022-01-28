@@ -23,6 +23,7 @@ struct exec_info {
 	char c_name[256];					// The name of the command that has been executed.
 	char c_used_alias[256];					// The alias that has been used.
 	char **c_values;					// The values that the been retrieved. Must be freed when there is no more use.
+	int c_argc;						// The arguments of the command.
 };
 
 struct command_d {
@@ -50,6 +51,7 @@ struct help_d {
 	char *h_description;					// The description of the help.
 	struct command_help **h_commands;			// The commands of the help.
 	char *h_close_description;				// The closure description.
+	int h_argc;						// The number of commands in help.
 };
 
 struct builder_d {
@@ -68,36 +70,33 @@ struct builder_d {
 	function must be collled.
 	@param c_builder The builder.
 */
-static inline void initialize_builder(struct builder_d *c_builder)
+static inline void initialize_builder(struct builder_d **c_builder)
 {
-	c_builder = (struct builder_d *) malloc(sizeof(struct builder_d));
-	c_builder->b_commands = (struct command_d **) calloc(1, sizeof(struct command_d **));
-	c_builder->b_help = (struct help_d *) calloc(1, sizeof(struct help_d));
-	c_builder->b_commandsc = 0;
+	*c_builder = (struct builder_d *) malloc(sizeof(struct builder_d));
+	(*c_builder)->b_commands = (struct command_d **) calloc(1, sizeof(struct command_d **));
+	(*c_builder)->b_help = (struct help_d *) calloc(1, sizeof(struct help_d));
+	(*c_builder)->b_commandsc = 0;
 }
 
 /**
 	Free the memory that has been allocated for the builder.
 	@param c_builder The builder to destroy.
 */
-static inline void destroy_builder(struct builder_d *c_builder)
+static inline void destroy_builder(struct builder_d **c_builder)
 {
-	// Free commands.
-	for (int c = 0; c_builder->b_commands[c]; c++) free(c_builder->b_commands[c]);
-	free(c_builder->b_commands);
-	c_builder->b_commands = NULL;
-
-	// Destroy help.
-	free(c_builder->b_help->h_description);
-	for (int c = 0; c_builder->b_help->h_commands[c]; c++) free(c_builder->b_help->h_commands[c]);
-	free(c_builder->b_help->h_commands);
-	free(c_builder->b_help);
-	c_builder->b_help = NULL;	
-
+	// Free the memory for the commands.
+	for (int c = 0; c < (*c_builder)->b_commandsc; c++) free((*c_builder)->b_commands[c]);
+	free((*c_builder)->b_commands);
 	
-	free(c_builder);
-	c_builder = NULL;
-}
+	// Free help.
+	for (int h = 0; h < (*c_builder)->b_help->h_argc; h++) 
+		free((*c_builder)->b_help->h_commands[h]);
+	free((*c_builder)->b_help);
+
+	// Free builder.
+	free(*c_builder);
+	*c_builder = NULL;
+}	
 
 
 
@@ -170,12 +169,12 @@ extern int add_command(struct builder_d *c_builder, const char c_name[256],
 	@return 0 on success or an integer error number on error.
 	errors:
 		no such command exists: -7
-`		builder is not initialized: -6
+		builder is not initialized: -6
 	all the erros are defined as MACROS.
 	
 */
 extern int add_action(struct builder_d *c_builder, const char *c_name, 
-		       void (*c_call_back)(const struct exec_info *info));
+		      void (*c_call_back)(const struct exec_info *info));
 
 
 /**
