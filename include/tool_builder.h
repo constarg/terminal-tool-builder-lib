@@ -95,19 +95,7 @@ static inline void destroy_builder(struct builder_d *c_builder)
 	c_builder = NULL;
 }
 
-/**
-	Free the memory that has been allocated for the values
-	that has been retrieved from terminal.
-	@param info The exec informations of the command.
-*/
-static inline void clear_exec_info(struct exec_info *info)
-{
-	for (int i = 0; info->c_values[i]; i++) free(info->c_values[i]);
 
-	free(info->c_values);
-	free(info);
-	info = NULL;
-}
 
 /**
 	Builds a basic help action that prints informations
@@ -208,7 +196,7 @@ static inline void add_command_easy(struct builder_d *c_builder, const struct co
 		
 	each error has a MACRO that can be used in if statements.
 */
-int execute_command(int argc, char **argv, const struct builder_d *c_builder);
+int execute_command(int argc, char *argv[], const struct builder_d *c_builder);
 
 
 

@@ -67,7 +67,7 @@ static inline struct command_d *find_command(const struct command_d **commands, 
 }
 
 
-int execute_command(int argc, char **argv, const struct builder_d *c_builder)
+int execute_command(int argc, char *argv[], const struct builder_d *c_builder)
 {
 	if (c_builder == NULL || c_builder->b_commands == NULL ||
 	    c_builder->b_help == NULL)
@@ -87,28 +87,13 @@ int execute_command(int argc, char **argv, const struct builder_d *c_builder)
 	if (command->c_call_back == NULL) return NO_ACTION_DEFINED;
 
 	// Build the info to recieve the call back.
-	struct exec_info *exec_inf = (struct exec_info *) calloc(1, sizeof(struct exec_info));
-	if (exec_inf == NULL) return FAILED_TO_MAKE_EXEC_INFO;
+	struct exec_info exec_inf;
+	strcpy(exec_inf.c_name, command->c_name);
+	strcpy(exec_inf.c_used_alias, argv[1]);
+	exec_inf.c_values = (argv + 2);	// This points to the first argument of the requested command. 
 
-	// Initialize infos.
-	strcpy(exec_inf->c_name, command->c_name);
-	strcpy(exec_inf->c_used_alias, argv[1]);
-	
-	// Save the values.
-	exec_inf->c_values = (char **) calloc(command->c_argc + 1, sizeof(char *));
-	if (exec_inf == NULL) return FAILED_TO_MAKE_EXEC_INFO;
-
-	
-	for (int curr_opt = 0; curr_opt < command->c_argc; curr_opt++)
-	{
-		exec_inf->c_values[curr_opt] = calloc(strlen(argv[curr_opt + 1]) + 1, sizeof(char));
-		if (exec_inf->c_values[curr_opt] == NULL) return FAILED_TO_MAKE_EXEC_INFO;
-		strcpy(exec_inf->c_values[curr_opt], argv[curr_opt + 1]);
-	}	
-
-	exec_inf->c_values[command->c_argc - 1] = NULL; // Null terminate.
 	// Call the callback with the values.
-	command->c_call_back(exec_inf);
+	command->c_call_back(&exec_inf);
 }
 
 
