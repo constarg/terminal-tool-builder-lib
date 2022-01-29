@@ -3,11 +3,15 @@ project(Test-command-tool-builder C)
 
 set(CMAKE_C_STANDARD 17)
 
-
+set(path ${CMAKE_CURRENT_SOURCE_DIR})
 
 add_executable(builder-test main.c)
 
-target_link_libraries(builder-test $ENV{HOME}/Documents/GitHub/terminal-tool-builder-lib/build/libtoolbuilder.a)
+
+cmake_path(GET path PARENT_PATH parent)
+
+target_link_libraries(builder-test ${parent}/build/libtoolbuilder.a)
+
 
 include_directories(../include/)
 

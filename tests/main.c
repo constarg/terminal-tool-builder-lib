@@ -1,5 +1,4 @@
-#include "../include/tool_builder.h"
-#include <string.h>
+#include <tool_builder.h>
 
 
 void testing_command_action(const struct exec_info *info)
@@ -39,18 +38,10 @@ int main(int argc, char *argv[]) {
 	char test_alias[5][256];
 	char test_2_alias[5][256];
 	// Initialize memory.
-	memset(test_alias[0], 0x0, 255);
-	memset(test_alias[1], 0x0, 255);
-	memset(test_alias[2], 0x0, 255);
-	memset(test_alias[3], 0x0, 255);
-	memset(test_alias[4], 0x0, 255);
+	initialize_alias(&test_alias);
+	initialize_alias(&test_2_alias);
 
-	memset(test_2_alias[0], 0x0, 255);
-	memset(test_2_alias[1], 0x0, 255);
-	memset(test_2_alias[2], 0x0, 255);
-	memset(test_2_alias[3], 0x0, 255);
-	memset(test_2_alias[4], 0x0, 255);
-
+	
 	test_alias[0][0] = 't';
 	test_alias[0][1] = '\0';
 	test_alias[1][0] = 'p';	

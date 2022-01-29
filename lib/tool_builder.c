@@ -36,31 +36,6 @@ extern void add_help_tool_closing_description(struct builder_d *c_builder, const
 
 }
 
-/**
-	Check if al the elements of the array is valid
-	strings.
-	@param 
-	@return The valid array.
-*/
-static char **cleanup_alias(const char c_alias[5][256])
-{
-	char **tmp_alias = malloc(sizeof(char *) * 5);
-
-	for (int i = 0; i < 5; i++)
-	{
-		tmp_alias[i] = NULL;
-		for (int c_a = 0; c_a < 256; c_a++)
-		{
-			if (c_alias[i][c_a] == '\0') 
-			{
-				tmp_alias[i] = (char *) &c_alias[i][0];
-				break;
-			}
-		}
-	}
-	return tmp_alias;
-}
-
 int add_command(struct builder_d *c_builder, const char c_name[256], int c_argc, const char c_alias[5][256], 
 		 void (*c_call_back)(const struct exec_info *info))
 {
@@ -72,13 +47,11 @@ int add_command(struct builder_d *c_builder, const char c_name[256], int c_argc,
 	strcpy(new_command->c_name, c_name);
 	new_command->c_argc = c_argc;
 
-	// Set the alias.
-	char **tmp = cleanup_alias(c_alias); 	
-
+	
 	for (int c_a = 0; c_a < 5; c_a++)
 	{
-		if (tmp[c_a] == NULL) continue;
-		strcpy(new_command->c_alias[c_a], tmp[c_a]);
+		if (c_alias[c_a] == NULL) continue;
+		strcpy(new_command->c_alias[c_a], c_alias[c_a]);
 	}	
 	new_command->c_call_back = c_call_back;
 
@@ -86,7 +59,6 @@ int add_command(struct builder_d *c_builder, const char c_name[256], int c_argc,
 	c_builder->b_commands[last_c] = new_command;
 	
 	c_builder->b_commandsc += 1;
-	free(tmp);
 }
 
 
@@ -94,11 +66,9 @@ int add_action(struct builder_d *c_builder, const char *c_name,
 	       void (*c_call_back)(const struct exec_info *info))
 {
 	if (c_builder == NULL || c_builder->b_commands == NULL) return BUILDER_IS_NOT_INITIALIZED;
-
 	struct command_d *ch_command = find_command((const struct command_d **) c_builder->b_commands, c_name,
 						    c_builder->b_commandsc);
 	if (ch_command == NULL) return NO_SUCH_COMMAND_EXISTS;
-
 	ch_command->c_call_back = c_call_back;	// Set the requested callback.
 }
 

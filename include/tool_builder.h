@@ -2,6 +2,7 @@
 #define TOOL_BUILDER_H
 
 #include <malloc.h>
+#include <string.h>
 
 #define TOOL_BUILDER_V 	1.0
 
@@ -76,6 +77,18 @@ static inline void initialize_builder(struct builder_d **c_builder)
 	(*c_builder)->b_commands = (struct command_d **) calloc(1, sizeof(struct command_d **));
 	(*c_builder)->b_help = (struct help_d *) calloc(1, sizeof(struct help_d));
 	(*c_builder)->b_commandsc = 0;
+}
+
+/**
+	Initialize the alias with zeros in order to avoid
+	problems with unitialized values. The use of this	
+	function is optional, but is good practice and
+	safer to initialize the alias before use them later.
+*/
+static inline void initialize_alias(char (*c_alias)[5][256])
+{
+	for (int c_a = 0; c_a < 5; c_a++)
+		memset((*c_alias)[c_a], 0x0, 255);
 }
 
 /**
