@@ -163,8 +163,13 @@ extern int add_full_help(struct builder_d *c_builder, const struct help_d *t_hel
 	Adds description to the help message.
 	@param description The description to be added.
 	@param c_builder The builder to add the description.
+	@return 0 on success or an integer error number on error.
+	errors:
+`		builder is not initialized: -6
+	all the erros are defined as MACROS.
+
 */
-extern void add_help_tool_description(struct builder_d *c_builder, const char *description);
+extern int add_help_tool_description(struct builder_d *c_builder, const char *description);
 
 /**
 	Adds to the help action a command and the description
@@ -172,8 +177,13 @@ extern void add_help_tool_description(struct builder_d *c_builder, const char *d
 	@command_name The name of the command to add.
 	@command_description The description of the command.
 	@c_builder The builder to add the command and command description.
+	@return 0 on success or an integer error number on error.
+	errors:
+`		builder is not initialized: -6
+	all the erros are defined as MACROS.
+
 */
-extern void add_help_tool_command(struct builder_d *c_builder, const char *command_name, 
+extern int add_help_tool_command(struct builder_d *c_builder, const char *command_name, 
 				  const char command_alias[5][256], const char *command_description);
 
 /**

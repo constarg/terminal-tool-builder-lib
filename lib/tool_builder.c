@@ -37,7 +37,7 @@ int initialize_help(struct builder_d *c_builder, const char *tool_name)
 	const char *str_u_2 = "[OPTION]...";
 	
 	size_t usage_size = strlen(tool_name) + strlen(str_u_1)
-				   + strlen(str_u_2) + 1;
+				   + strlen(str_u_2) + 3;
  
 	char *(*usage_sec) = &c_builder->b_help->h_usage_sec;
 	*usage_sec = malloc(sizeof(char) * usage_size);
@@ -70,16 +70,48 @@ int add_full_help(struct builder_d *c_builder, const struct help_d *t_help)
 }
 
 
-void add_help_tool_description(struct builder_d *c_builder, const char *description)
+int add_help_tool_description(struct builder_d *c_builder, const char *description)
 {
+	if (c_builder == NULL || c_builder->b_help == NULL) return BUILDER_IS_NOT_INITIALIZED;
 
+	struct help_d *(*help_tmp) = &c_builder->b_help; 
+	(*help_tmp)->h_description = malloc(sizeof(char) * strlen(description) + 1);
+	strcpy((*help_tmp)->h_description, description);
+	
+	return 0;
 }
 
 
-void add_help_tool_command(struct builder_d *c_builder, const char *command_name, 
+int add_help_tool_command(struct builder_d *c_builder, const char *command_name, 
 			   const char command_alias[5][256], const char *command_description)
 {
+	if (c_builder == NULL || c_builder->b_help == NULL) return BUILDER_IS_NOT_INITIALIZED;
+
+	struct command_help *new_command_h = malloc(sizeof(struct command_help)); 
+	new_command_h->c_name = malloc(sizeof(char) * (strlen(command_name) + 1));
+	new_command_h->c_description = malloc(sizeof(char) * (strlen(command_description) + 1));
+	if (new_command_h->c_name == NULL || new_command_h->c_description == NULL)
+		return FAILED_TO_ADD;
 	
+	// Copy the contents.
+	strcpy(new_command_h->c_name, command_name);
+	strcpy(new_command_h->c_description, command_description);	
+
+	// Copy the alias.
+	for (int c_a = 0; c_a < 5; c_a++)
+		strcpy(new_command_h->c_alias[c_a], command_alias[c_a]);
+
+	int last_c = c_builder->b_help->h_argc;
+	c_builder->b_help->h_commands = (struct command_help **) realloc(c_builder->b_help->h_commands,
+									 sizeof(struct command_help *) * (last_c + 1));
+	if (c_builder->b_help->h_commands == NULL)
+		return FAILED_TO_ADD;
+
+	// Save the new command.
+	c_builder->b_help->h_commands[last_c] = new_command_h;
+	// Increase the number of commands.
+	c_builder->b_help->h_argc += 1;
+	return 0;
 }
 
 
@@ -108,10 +140,8 @@ int add_command(struct builder_d *c_builder, const char c_name[256], int c_argc,
 	new_command->c_argc = c_argc;
 	
 	for (int c_a = 0; c_a < 5; c_a++)
-	{
-		if (c_alias[c_a] == NULL) continue;
 		strcpy(new_command->c_alias[c_a], c_alias[c_a]);
-	}	
+
 	new_command->c_call_back = c_call_back;
 	c_builder->b_commands = (struct command_d **) realloc(c_builder->b_commands, 
 							     sizeof(struct command_d *) * (last_c + 1));

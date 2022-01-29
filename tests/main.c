@@ -43,6 +43,8 @@ int main(int argc, char *argv[]) {
 
 	initialize_help(builder, "Testing-tool");
 
+	// Add description to the docs of help.
+	add_help_tool_description(builder, "This is a test of a description");	
 	
 	// One character aliases.
 	test_alias[0][0] = 't';
@@ -56,6 +58,10 @@ int main(int argc, char *argv[]) {
 	
 	strcpy(test_2_alias[2], "Some");
 	
+	// Add a new command to the docs of help.
+	add_help_tool_command(builder, "Testing", test_alias, "This command is a test command");
+
+
 	add_command(
 		builder,
 		"Testing",
