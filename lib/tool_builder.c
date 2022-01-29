@@ -10,17 +10,22 @@ static void help_defualt_action(const struct exec_info *info)
 {
 	// Prints the help message.
 	struct builder_d *builder = info->c_builder;
+	if (builder == NULL || builder->b_help == NULL) return;
 	printf("%s\n", builder->b_help->h_usage_sec);
+	
+	if (builder->b_help->h_description == NULL) return;
 	printf("%s\n\n\n", builder->b_help->h_description);
 	
 	struct command_help **commands_h = builder->b_help->h_commands;
-	for (int h = 0; h < builder->b_help->h_argc; h++)
+	for (int h = 0; h < builder->b_help->h_argc && commands_h[h]; h++)
 	{
 		printf("%s", commands_h[h]->c_name);
-		for (int c_a = 0; c_a < 5; c_a++)
+		for (int c_a = 0; c_a < 5 && commands_h[h]->c_alias[c_a]; c_a++)
 			printf(" ,%s,", commands_h[h]->c_alias[c_a]);
 		printf("\t\t%s\n\n", commands_h[h]->c_description);
 	}
+
+	if (builder->b_help->h_close_description == NULL) return;
 	printf("%s\n", builder->b_help->h_close_description);
 }
 
@@ -101,7 +106,6 @@ int add_command(struct builder_d *c_builder, const char c_name[256], int c_argc,
 	struct command_d *new_command = (struct command_d *) malloc(sizeof(struct command_d));
 	strcpy(new_command->c_name, c_name);
 	new_command->c_argc = c_argc;
-
 	
 	for (int c_a = 0; c_a < 5; c_a++)
 	{
@@ -161,10 +165,11 @@ int execute_command(int argc, char *argv[], const struct builder_d *c_builder)
 
 	if (argv[1] == NULL) return EMPTY_NAME;
 
+
 	// Get the requested command to execute.
 	struct command_d *command = find_command((const struct command_d **) c_builder->b_commands, argv[1],
 						 c_builder->b_commandsc);
-
+	
 	if (command == NULL) return WRONG_NAME_OR_ALIAS;
 
 	if (((argc - 2) - command->c_argc) < 0) return WRONG_ARG_NUM;

@@ -41,6 +41,8 @@ int main(int argc, char *argv[]) {
 	initialize_alias(&test_alias);
 	initialize_alias(&test_2_alias);
 
+	initialize_help(builder, "Testing-tool");
+
 	
 	// One character aliases.
 	test_alias[0][0] = 't';

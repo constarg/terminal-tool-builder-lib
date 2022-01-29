@@ -4,7 +4,7 @@
 #include <malloc.h>
 #include <string.h>
 
-#define TOOL_BUILDER_V 	1.0
+#define TOOL_BUILDER_V 			 1.0
 
 // errors
 #define WRONG_ARG_NUM			-1
