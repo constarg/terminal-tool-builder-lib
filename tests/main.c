@@ -42,15 +42,17 @@ int main(int argc, char *argv[]) {
 	initialize_alias(&test_2_alias);
 
 	
+	// One character aliases.
 	test_alias[0][0] = 't';
-	test_alias[0][1] = '\0';
 	test_alias[1][0] = 'p';	
-	test_alias[1][1] = '\0';	
 
 	test_2_alias[0][0] = 's';
-	test_2_alias[0][1] = '\0';
 	test_2_alias[1][0] = 'v';	
-	test_2_alias[1][1] = '\0';
+
+	// String aliases.
+	strcpy(test_alias[2], "test");
+	
+	strcpy(test_2_alias[2], "Some");
 	
 	add_command(
 		builder,
