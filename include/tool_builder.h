@@ -25,6 +25,7 @@
 struct command_help 
 {
 	char *c_name;						// The name of the command.
+	char c_alias[5][256];					// The alias of the command.
 	char *c_description;					// The description of the command.
 };
 
@@ -113,7 +114,7 @@ static inline void destroy_builder(struct builder_d **c_builder)
 	// Free help.
 	for (int h = 0; h < (*c_builder)->b_help->h_argc; h++) 
 	{
-		free((*c_builder)->b_help->h_commands[h]->c_name)
+		free((*c_builder)->b_help->h_commands[h]->c_name);
 		free((*c_builder)->b_help->h_commands[h]->c_description);
 		free((*c_builder)->b_help->h_commands[h]);
 	}	
@@ -173,7 +174,7 @@ extern void add_help_tool_description(struct builder_d *c_builder, const char *d
 	@c_builder The builder to add the command and command description.
 */
 extern void add_help_tool_command(struct builder_d *c_builder, const char *command_name, 
-				  const char *command_description);
+				  const char command_alias[5][256], const char *command_description);
 
 /**
 	Adds a description in the end of the help message.

@@ -19,8 +19,9 @@ static void help_defualt_action(const struct exec_info *info)
 		printf("%s", commands_h[h]->c_name);
 		for (int c_a = 0; c_a < 5; c_a++)
 			printf(" ,%s,", commands_h[h]->c_alias[c_a]);
-		printf("\t\t%s", commands_h[h]->c_description);
-	}	
+		printf("\t\t%s\n\n", commands_h[h]->c_description);
+	}
+	printf("%s\n", builder->b_help->h_close_description);
 }
 
 int initialize_help(struct builder_d *c_builder, const char *tool_name)
@@ -71,7 +72,7 @@ void add_help_tool_description(struct builder_d *c_builder, const char *descript
 
 
 void add_help_tool_command(struct builder_d *c_builder, const char *command_name, 
-			   const char *command_description)
+			   const char command_alias[5][256], const char *command_description)
 {
 	
 }
@@ -105,7 +106,7 @@ int add_command(struct builder_d *c_builder, const char c_name[256], int c_argc,
 	for (int c_a = 0; c_a < 5; c_a++)
 	{
 		if (c_alias[c_a] == NULL) continue;
-		strcpy(new_command->c_alias[c_a], c_alias[c_a]);;
+		strcpy(new_command->c_alias[c_a], c_alias[c_a]);
 	}	
 	new_command->c_call_back = c_call_back;
 	c_builder->b_commands = (struct command_d **) realloc(c_builder->b_commands, 
