@@ -14,20 +14,47 @@
 
 #define NO_ACTION_DEFINED		-4
 
-#define FAILED_TO_MAKE_EXEC_INFO	-5
+#define FAILED_TO_ADD			-5
 #define BUILDER_IS_NOT_INITIALIZED	-6
 
 #define NO_SUCH_COMMAND_EXISTS		-7
 
+#define UNITIALIZED_HELP		-8
 
-struct exec_info {
+
+struct command_help 
+{
+	char *c_name;						// The name of the command.
+	char *c_description;					// The description of the command.
+};
+
+struct help_d 
+{
+	char *h_usage_sec;					// The useage section. example: Usage: tool_name [OPTION]...
+	char *h_description;					// The description of the help.
+	struct command_help **h_commands;			// The commands of the help.
+	char *h_close_description;				// The closure description.
+	int h_argc;						// The number of commands in help.
+};
+
+struct builder_d 
+{
+	struct command_d **b_commands;				// Null terminated array of commands.
+	int b_commandsc;					// The number of the commands.
+	struct help_d *b_help;					// The help of the tool.
+};
+
+struct exec_info 
+{
 	char c_name[256];					// The name of the command that has been executed.
 	char c_used_alias[256];					// The alias that has been used.
 	char **c_values;					// The values that the been retrieved. Must be freed when there is no more use.
 	int c_argc;						// The arguments of the command.
+	struct builder_d *c_builder;				// The builder.
 };
 
-struct command_d {
+struct command_d 
+{
 	char c_name[256];					// The name of the command.
 	int c_argc;						// How many argcs the command require.
 	char c_alias[5][256];					// The alias of the commnad. 5 is the maximum number of alias.
@@ -42,24 +69,6 @@ struct command_d {
 	void (*c_call_back)(const struct exec_info *info);	// The action to take when the command has been requested.
 };
 
-struct command_help {
-	char *c_name;						// The name of the command.
-	char *c_alias;						// The alias of the command.
-	char *c_description;					// The description of the command.
-};
-
-struct help_d {
-	char *h_description;					// The description of the help.
-	struct command_help **h_commands;			// The commands of the help.
-	char *h_close_description;				// The closure description.
-	int h_argc;						// The number of commands in help.
-};
-
-struct builder_d {
-	struct command_d **b_commands;				// Null terminated array of commands.
-	int b_commandsc;					// The number of the commands.
-	struct help_d *b_help;					// The help of the tool.
-};
 
 
 /**
@@ -103,7 +112,14 @@ static inline void destroy_builder(struct builder_d **c_builder)
 	
 	// Free help.
 	for (int h = 0; h < (*c_builder)->b_help->h_argc; h++) 
+	{
+		free((*c_builder)->b_help->h_commands[h]->c_name)
+		free((*c_builder)->b_help->h_commands[h]->c_description);
 		free((*c_builder)->b_help->h_commands[h]);
+	}	
+	free((*c_builder)->b_help->h_usage_sec);
+	free((*c_builder)->b_help->h_close_description);
+	free((*c_builder)->b_help->h_description);
 	free((*c_builder)->b_help);
 
 	// Free builder.
@@ -118,8 +134,14 @@ static inline void destroy_builder(struct builder_d **c_builder)
 	about the tool.
 	@param tool_name The name of the tool.
 	@param c_builder The builder to add the help.
+	@return 0 on success or an integer error number on error.
+	errors:
+`		builder is not initialized: -6
+		failed to add: -5	
+	all the erros are defined as MACROS.
+
 */
-extern void initialize_help(struct builder_d *c_builder, const char *tool_name);
+extern int initialize_help(struct builder_d *c_builder, const char *tool_name);
 
 /**
 	Adds user defined format of help.
@@ -127,8 +149,14 @@ extern void initialize_help(struct builder_d *c_builder, const char *tool_name);
 	function must be ignored.
 	@param c_builder The builder to add the help.
 	@param t_help	 The full help.
+	@return 0 on success or an integer error number on error.
+	errors:
+`		builder is not initialized: -6
+		unitialized help: -7
+	all the erros are defined as MACROS.
+
 */
-extern void add_full_help(struct builder_d *c_builder, const struct help_d *t_help);
+extern int add_full_help(struct builder_d *c_builder, const struct help_d *t_help);
 
 /**
 	Adds description to the help message.
@@ -152,8 +180,14 @@ extern void add_help_tool_command(struct builder_d *c_builder, const char *comma
 	For example @copyright xxx or something like that.
 	@param description The description to be added.
 	@param c_builder The builder to add a closing descripton on help.
+	@return 0 on success or an integer error number on error.
+	errors:
+`		builder is not initialized: -6
+		failed to add description: -5
+	all the erros are defined as MACROS.
+
 */
-extern void add_help_tool_closing_description(struct builder_d *c_builder, const char *description);
+extern int add_help_tool_closing_description(struct builder_d *c_builder, const char *close_description);
 
 /**
 	Adds a new command.
