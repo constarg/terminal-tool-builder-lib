@@ -24,7 +24,7 @@ followed.<br>
 % cd build/
 % cmake ../
 % make
-% sudo make install
+% sudo make install // This does not work at the time. But i will make it soon.
 ```
 
 `
