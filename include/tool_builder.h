@@ -106,9 +106,8 @@ extern int add_help_tool_command(struct builder_d *c_builder, const char *comman
 	Adds alias to the help docs
 	@param c_builder The builder of the tool.
 	@param c_name The name of the command in docs.
-	@param c_alias The aliases. Can be any number.
 */
-extern int add_help_tool_alias(struct builder_d *c_builder, const char *c_name, const char *c_alias, ...);
+extern int add_help_tool_alias(struct builder_d *c_builder, const char *c_name);
 
 /**
 	Adds a description in the end of the help message.

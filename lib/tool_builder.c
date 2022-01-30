@@ -18,7 +18,7 @@ struct help_d
 	char *h_description;					// The description of the help.
 	struct command_help **h_commands;			// The commands of the help.
 	char *h_close_description;				// The closure description.
-	int h_argc;						// The number of commands in help.
+	int h_commandsc;					// The number of commands in help.
 };
 
 struct command_d 
@@ -52,7 +52,7 @@ static void help_defualt_action(const struct exec_info *info)
 	printf("%s\n\n\n", builder->b_help->h_description);
 	
 	struct command_help **commands_h = builder->b_help->h_commands;
-	for (int h = 0; h < builder->b_help->h_argc && commands_h[h]; h++)
+	for (int h = 0; h < builder->b_help->h_commandsc; h++)
 	{
 		printf("%s", commands_h[h]->c_name);
 		for (int c_a = 0; commands_h[h]->c_alias[c_a]; c_a++)
@@ -83,7 +83,7 @@ void destroy_builder(struct builder_d **c_builder)
 	free((*c_builder)->b_commands);
 	
 	// Free help.
-	for (int h = 0; h < (*c_builder)->b_help->h_argc; h++) 
+	for (int h = 0; h < (*c_builder)->b_help->h_commandsc; h++) 
 	{
 		// TODO - destroy alias.
 		free((*c_builder)->b_help->h_commands[h]->c_name);
@@ -157,7 +157,7 @@ int add_help_tool_command(struct builder_d *c_builder, const char *command_name,
 	strcpy(new_command_h->c_name, command_name);
 	strcpy(new_command_h->c_description, command_description);	
 
-	int last_c = c_builder->b_help->h_argc;
+	int last_c = c_builder->b_help->h_commandsc;
 	c_builder->b_help->h_commands = (struct command_help **) realloc(c_builder->b_help->h_commands,
 									 sizeof(struct command_help *) * (last_c + 1));
 	if (c_builder->b_help->h_commands == NULL)
@@ -166,14 +166,24 @@ int add_help_tool_command(struct builder_d *c_builder, const char *command_name,
 	// Save the new command.
 	c_builder->b_help->h_commands[last_c] = new_command_h;
 	// Increase the number of commands.
-	c_builder->b_help->h_argc += 1;
+	c_builder->b_help->h_commandsc += 1;
 	return 0;
 }
 
-int add_help_tool_alias(struct builder_d *c_builder, const char *c_name, 
-			const char *c_alias, ...)
+int add_help_tool_alias(struct builder_d *c_builder, const char *c_name)
 {
-	
+	if (c_builder == NULL || c_builder->b_help == NULL)
+		return BUILDER_IS_NOT_INITIALIZED;
+
+	struct command_d *c_found = find_command((const struct command_d **) c_builder->b_commands,
+						 c_name, c_builder->b_commandsc);
+	if (c_found == NULL) return NO_SUCH_COMMAND_EXISTS;
+
+	for (int h = 0; h <c_builder->b_help->h_commandsc; h++)
+	{
+		if (!strcmp(c_builder->b_help->h_commands[h]->c_name, c_found->c_name))
+			c_builder->b_help->h_commands[h]->c_alias = c_found->c_alias;
+	}
 }
 
 int add_help_tool_closing_description(struct builder_d *c_builder, const char *close_description)
@@ -211,6 +221,7 @@ int add_command(struct builder_d *c_builder, const char c_name[256], int c_argc,
 int add_command_alias(struct builder_d *c_builder, const char *c_name, 
 		      const char *c_alias, ...) 
 {
+	// TODO - Get the alias and set them into the ascociated command.
 }
 
 
