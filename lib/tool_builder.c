@@ -54,7 +54,7 @@ static void help_defualt_action(const struct exec_info *info)
 	struct command_help **commands_h = builder->b_help->h_commands;
 	for (int h = 0; h < builder->b_help->h_commandsc; h++)
 	{
-		printf("%s", commands_h[h]->c_name);
+		printf("\t%s", commands_h[h]->c_name);
 		for (int c_a = 0; commands_h[h]->c_alias[c_a]; c_a++)
 			printf(" ,%s,", commands_h[h]->c_alias[c_a]);
 		printf("\t\t%s\n\n", commands_h[h]->c_description);
@@ -118,16 +118,20 @@ int initialize_help(struct builder_d *c_builder, const char *tool_name)
 	sprintf((*usage_sec),"%s %s %s", str_u_1, tool_name, str_u_2);
 	
 	// Initialize help as a command.
-	// TODO - add the alias of help here.
-	// help alias.
-	
 	// Add command.
-	return add_command(
+	int error = add_command(
 		c_builder,
 		"--help",
 		0,
 		&help_defualt_action
 	); 
+	if (error != 0) return error;
+
+	// help alias.
+	error = add_command_alias(c_builder, "--help", "-h", NULL);
+	if (error != 0) return error;
+
+	return add_help_tool_alias(c_builder, "--help");
 }
 
 int add_help_tool_description(struct builder_d *c_builder, const char *description)
