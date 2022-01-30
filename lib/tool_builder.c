@@ -1,6 +1,41 @@
 #include <string.h>
 #include <stdlib.h>
+#include <stdarg.h>
 #include <tool_builder.h>
+
+
+// Priavte implementation of structs.
+struct command_help 
+{
+	char *c_name;						// The name of the command.
+	char *(*c_alias);					// The alias of the command.
+	char *c_description;					// The description of the command.
+};
+
+struct help_d 
+{
+	char *h_usage_sec;					// The useage section. example: Usage: tool_name [OPTION]...
+	char *h_description;					// The description of the help.
+	struct command_help **h_commands;			// The commands of the help.
+	char *h_close_description;				// The closure description.
+	int h_argc;						// The number of commands in help.
+};
+
+struct command_d 
+{
+	char c_name[256];					// The name of the command.
+	int c_argc;						// How many argcs the command require.
+	char *(*c_alias);						// The alias of the commnad. 5 is the maximum number of alias.
+	/**
+		This callback is user defined and is executed
+		when the user request a call of the specific
+		command defined in @name field from terminal.
+		@param value The parameters that have been
+		retrieved from the terminal when the command
+		was called.
+	*/
+	void (*c_call_back)(const struct exec_info *info);	// The action to take when the command has been requested.
+};
 
 
 static inline struct command_d *find_command(const struct command_d **commands, const char *c_name,
@@ -20,7 +55,7 @@ static void help_defualt_action(const struct exec_info *info)
 	for (int h = 0; h < builder->b_help->h_argc && commands_h[h]; h++)
 	{
 		printf("%s", commands_h[h]->c_name);
-		for (int c_a = 0; c_a < 5 && commands_h[h]->c_alias[c_a]; c_a++)
+		for (int c_a = 0; commands_h[h]->c_alias[c_a]; c_a++)
 			printf(" ,%s,", commands_h[h]->c_alias[c_a]);
 		printf("\t\t%s\n\n", commands_h[h]->c_description);
 	}
@@ -28,6 +63,43 @@ static void help_defualt_action(const struct exec_info *info)
 	if (builder->b_help->h_close_description == NULL) return;
 	printf("%s\n", builder->b_help->h_close_description);
 }
+
+void initialize_builder(struct builder_d **c_builder)
+{
+	*c_builder = (struct builder_d *) malloc(sizeof(struct builder_d));
+	(*c_builder)->b_commands = (struct command_d **) calloc(1, sizeof(struct command_d **));
+	(*c_builder)->b_help = (struct help_d *) calloc(1, sizeof(struct help_d));
+	(*c_builder)->b_commandsc = 0;
+}
+
+void destroy_builder(struct builder_d **c_builder)
+{
+	// Free the memory for the commands.
+	for (int c = 0; c < (*c_builder)->b_commandsc; c++) 
+	{
+		// TODO - destroy alias.
+		free((*c_builder)->b_commands[c]);
+	}
+	free((*c_builder)->b_commands);
+	
+	// Free help.
+	for (int h = 0; h < (*c_builder)->b_help->h_argc; h++) 
+	{
+		// TODO - destroy alias.
+		free((*c_builder)->b_help->h_commands[h]->c_name);
+		free((*c_builder)->b_help->h_commands[h]->c_description);
+		free((*c_builder)->b_help->h_commands[h]);
+	}	
+	free((*c_builder)->b_help->h_usage_sec);
+	free((*c_builder)->b_help->h_close_description);
+	free((*c_builder)->b_help->h_description);
+	free((*c_builder)->b_help);
+
+	// Free builder.
+	free(*c_builder);
+	*c_builder = NULL;
+}	
+
 
 int initialize_help(struct builder_d *c_builder, const char *tool_name)
 {
@@ -46,29 +118,17 @@ int initialize_help(struct builder_d *c_builder, const char *tool_name)
 	sprintf((*usage_sec),"%s %s %s", str_u_1, tool_name, str_u_2);
 	
 	// Initialize help as a command.
-	char h_alias[5][256];
-	initialize_alias(&h_alias);
+	// TODO - add the alias of help here.
 	// help alias.
-	strcpy(h_alias[0], "-h");
+	
 	// Add command.
 	return add_command(
 		c_builder,
 		"--help",
 		0,
-		h_alias,
 		&help_defualt_action
 	); 
 }
-
-int add_full_help(struct builder_d *c_builder, const struct help_d *t_help)
-{
-	if (c_builder == NULL) return BUILDER_IS_NOT_INITIALIZED;
-	if (t_help == NULL) return UNITIALIZED_HELP;
-
-	// Copy the help variable contents from the user to the builder.
-	memcpy(&c_builder->b_help, &t_help, sizeof(struct help_d));	
-}
-
 
 int add_help_tool_description(struct builder_d *c_builder, const char *description)
 {
@@ -83,7 +143,7 @@ int add_help_tool_description(struct builder_d *c_builder, const char *descripti
 
 
 int add_help_tool_command(struct builder_d *c_builder, const char *command_name, 
-			   const char command_alias[5][256], const char *command_description)
+			  const char *command_description)
 {
 	if (c_builder == NULL || c_builder->b_help == NULL) return BUILDER_IS_NOT_INITIALIZED;
 
@@ -96,10 +156,6 @@ int add_help_tool_command(struct builder_d *c_builder, const char *command_name,
 	// Copy the contents.
 	strcpy(new_command_h->c_name, command_name);
 	strcpy(new_command_h->c_description, command_description);	
-
-	// Copy the alias.
-	for (int c_a = 0; c_a < 5; c_a++)
-		strcpy(new_command_h->c_alias[c_a], command_alias[c_a]);
 
 	int last_c = c_builder->b_help->h_argc;
 	c_builder->b_help->h_commands = (struct command_help **) realloc(c_builder->b_help->h_commands,
@@ -114,6 +170,11 @@ int add_help_tool_command(struct builder_d *c_builder, const char *command_name,
 	return 0;
 }
 
+int add_help_tool_alias(struct builder_d *c_builder, const char *c_name, 
+			const char *c_alias, ...)
+{
+	
+}
 
 int add_help_tool_closing_description(struct builder_d *c_builder, const char *close_description)
 {
@@ -128,7 +189,7 @@ int add_help_tool_closing_description(struct builder_d *c_builder, const char *c
 	return 0;
 }
 
-int add_command(struct builder_d *c_builder, const char c_name[256], int c_argc, const char c_alias[5][256], 
+int add_command(struct builder_d *c_builder, const char c_name[256], int c_argc,  
 		 void (*c_call_back)(const struct exec_info *info))
 {
 	if (c_builder == NULL) return BUILDER_IS_NOT_INITIALIZED;
@@ -139,15 +200,17 @@ int add_command(struct builder_d *c_builder, const char c_name[256], int c_argc,
 	strcpy(new_command->c_name, c_name);
 	new_command->c_argc = c_argc;
 	
-	for (int c_a = 0; c_a < 5; c_a++)
-		strcpy(new_command->c_alias[c_a], c_alias[c_a]);
-
 	new_command->c_call_back = c_call_back;
 	c_builder->b_commands = (struct command_d **) realloc(c_builder->b_commands, 
 							     sizeof(struct command_d *) * (last_c + 1));
 	c_builder->b_commands[last_c] = new_command;	
 	c_builder->b_commandsc += 1;
 	return 0;
+}
+
+int add_command_alias(struct builder_d *c_builder, const char *c_name, 
+		      const char *c_alias, ...) 
+{
 }
 
 
@@ -175,7 +238,8 @@ static inline struct command_d *find_command(const struct command_d **commands, 
 		else
 		{
 			// Check if any of the alias of the current command is the c_name.
-			for (int curr_a = 0; curr_a < 5; curr_a++)
+			if (commands[curr_c]->c_alias == NULL) continue;
+			for (int curr_a = 0; commands[curr_c]->c_alias[curr_a]; curr_a++)
 		 	{
 				if (!strcmp(commands[curr_c]->c_alias[curr_a], c_name)) return (struct command_d *) commands[curr_c]; 
 			}

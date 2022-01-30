@@ -35,38 +35,19 @@ int main(int argc, char *argv[]) {
 	initialize_builder(&builder);
 
 
-	char test_alias[5][256];
-	char test_2_alias[5][256];
-	// Initialize memory.
-	initialize_alias(&test_alias);
-	initialize_alias(&test_2_alias);
-
-	initialize_help(builder, "Testing-tool");
+	//initialize_help(builder, "Testing-tool");
 
 	// Add description to the docs of help.
-	add_help_tool_description(builder, "This is a test of a description");	
+	//add_help_tool_description(builder, "This is a test of a description");	
 	
-	// One character aliases.
-	test_alias[0][0] = 't';
-	test_alias[1][0] = 'p';	
-
-	test_2_alias[0][0] = 's';
-	test_2_alias[1][0] = 'v';	
-
-	// String aliases.
-	strcpy(test_alias[2], "test");
-	
-	strcpy(test_2_alias[2], "Some");
 	
 	// Add a new command to the docs of help.
-	add_help_tool_command(builder, "Testing", test_alias, "This command is a test command");
-
+	//add_help_tool_command(builder, "Testing", "This command is a test command");
 
 	add_command(
 		builder,
 		"Testing",
 		2,
-		test_alias,
 		&testing_command_action	
 	);
 
@@ -74,10 +55,11 @@ int main(int argc, char *argv[]) {
 		builder,
 		"Something",
 		3,
-		test_2_alias,
 		&testing_2_command_action
 	);
 
+
+	add_command_alias(builder, "Testing", "Test", "t", "te", NULL); 
 
 	int error = execute_command(argc, argv, builder);
 	printf("Error = %d\n", error);

@@ -22,25 +22,13 @@
 #define UNITIALIZED_HELP		-8
 
 
-struct command_help 
-{
-	char *c_name;						// The name of the command.
-	char c_alias[5][256];					// The alias of the command.
-	char *c_description;					// The description of the command.
-};
-
-struct help_d 
-{
-	char *h_usage_sec;					// The useage section. example: Usage: tool_name [OPTION]...
-	char *h_description;					// The description of the help.
-	struct command_help **h_commands;			// The commands of the help.
-	char *h_close_description;				// The closure description.
-	int h_argc;						// The number of commands in help.
-};
+struct command_help;
+struct help_d; 
+struct command_d; 
 
 struct builder_d 
 {
-	struct command_d **b_commands;				// Null terminated array of commands.
+	struct command_d **b_commands;				// array of commands.
 	int b_commandsc;					// The number of the commands.
 	struct help_d *b_help;					// The help of the tool.
 };
@@ -49,25 +37,9 @@ struct exec_info
 {
 	char c_name[256];					// The name of the command that has been executed.
 	char c_used_alias[256];					// The alias that has been used.
-	char **c_values;					// The values that the been retrieved. Must be freed when there is no more use.
+	char *(*c_values);					// The values that the been retrieved. Must be freed when there is no more use.
 	int c_argc;						// The arguments of the command.
 	struct builder_d *c_builder;				// The builder.
-};
-
-struct command_d 
-{
-	char c_name[256];					// The name of the command.
-	int c_argc;						// How many argcs the command require.
-	char c_alias[5][256];					// The alias of the commnad. 5 is the maximum number of alias.
-	/**
-		This callback is user defined and is executed
-		when the user request a call of the specific
-		command defined in @name field from terminal.
-		@param value The parameters that have been
-		retrieved from the terminal when the command
-		was called.
-	*/
-	void (*c_call_back)(const struct exec_info *info);	// The action to take when the command has been requested.
 };
 
 
@@ -81,54 +53,13 @@ struct command_d
 	function must be collled.
 	@param c_builder The builder.
 */
-static inline void initialize_builder(struct builder_d **c_builder)
-{
-	*c_builder = (struct builder_d *) malloc(sizeof(struct builder_d));
-	(*c_builder)->b_commands = (struct command_d **) calloc(1, sizeof(struct command_d **));
-	(*c_builder)->b_help = (struct help_d *) calloc(1, sizeof(struct help_d));
-	(*c_builder)->b_commandsc = 0;
-}
-
-/**
-	Initialize the alias with zeros in order to avoid
-	problems with unitialized values. The use of this	
-	function is optional, but is good practice and
-	safer to initialize the alias before use them later.
-*/
-static inline void initialize_alias(char (*c_alias)[5][256])
-{
-	for (int c_a = 0; c_a < 5; c_a++)
-		memset((*c_alias)[c_a], 0x0, 255);
-}
+extern void initialize_builder(struct builder_d **c_builder);
 
 /**
 	Free the memory that has been allocated for the builder.
 	@param c_builder The builder to destroy.
 */
-static inline void destroy_builder(struct builder_d **c_builder)
-{
-	// Free the memory for the commands.
-	for (int c = 0; c < (*c_builder)->b_commandsc; c++) free((*c_builder)->b_commands[c]);
-	free((*c_builder)->b_commands);
-	
-	// Free help.
-	for (int h = 0; h < (*c_builder)->b_help->h_argc; h++) 
-	{
-		free((*c_builder)->b_help->h_commands[h]->c_name);
-		free((*c_builder)->b_help->h_commands[h]->c_description);
-		free((*c_builder)->b_help->h_commands[h]);
-	}	
-	free((*c_builder)->b_help->h_usage_sec);
-	free((*c_builder)->b_help->h_close_description);
-	free((*c_builder)->b_help->h_description);
-	free((*c_builder)->b_help);
-
-	// Free builder.
-	free(*c_builder);
-	*c_builder = NULL;
-}	
-
-
+extern void destroy_builder(struct builder_d **c_builder);
 
 /**
 	Builds a basic help action that prints informations
@@ -143,21 +74,6 @@ static inline void destroy_builder(struct builder_d **c_builder)
 
 */
 extern int initialize_help(struct builder_d *c_builder, const char *tool_name);
-
-/**
-	Adds user defined format of help.
-	If this function is used. Then the initialize_help
-	function must be ignored.
-	@param c_builder The builder to add the help.
-	@param t_help	 The full help.
-	@return 0 on success or an integer error number on error.
-	errors:
-`		builder is not initialized: -6
-		unitialized help: -7
-	all the erros are defined as MACROS.
-
-*/
-extern int add_full_help(struct builder_d *c_builder, const struct help_d *t_help);
 
 /**
 	Adds description to the help message.
@@ -183,8 +99,16 @@ extern int add_help_tool_description(struct builder_d *c_builder, const char *de
 	all the erros are defined as MACROS.
 
 */
-extern int add_help_tool_command(struct builder_d *c_builder, const char *command_name, 
-				  const char command_alias[5][256], const char *command_description);
+extern int add_help_tool_command(struct builder_d *c_builder, const char *command_name,
+				 const char *command_description);
+
+/**
+	Adds alias to the help docs
+	@param c_builder The builder of the tool.
+	@param c_name The name of the command in docs.
+	@param c_alias The aliases. Can be any number.
+*/
+extern int add_help_tool_alias(struct builder_d *c_builder, const char *c_name, const char *c_alias, ...);
 
 /**
 	Adds a description in the end of the help message.
@@ -214,9 +138,18 @@ extern int add_help_tool_closing_description(struct builder_d *c_builder, const 
 
 */
 extern int add_command(struct builder_d *c_builder, const char c_name[256], 
-			int c_argc, const char c_alias[5][256], 
-			void (*c_call_back)(const struct exec_info *info));
+			int c_argc, void (*c_call_back)(const struct exec_info *info));
 
+
+/**
+	Adds alias to a command.
+	@param c_builder The builder of the tool.
+	@param c_name The name of the command to add the alias.
+	@param c_alias variable length parameter, can get unlimited
+	number of alias.
+	 
+*/
+extern int add_command_alias(struct builder_d *c_builder, const char *c_name, const char *c_alias, ...);
 
 /**
 	Set or change the callback function of a specific
@@ -233,24 +166,6 @@ extern int add_command(struct builder_d *c_builder, const char c_name[256],
 */
 extern int add_action(struct builder_d *c_builder, const char *c_name, 
 		      void (*c_call_back)(const struct exec_info *info));
-
-
-/**
-	Adds a new command using by user defined value
-	using the struct.
-	@param c_builder The builder to add the command.
-	@param command The command to add.
-*/
-static inline int add_command_easy(struct builder_d *c_builder, const struct command_d *command) 
-{
-	return add_command(
-		c_builder,
-		command->c_name,
-		command->c_argc,
-		command->c_alias,
-		command->c_call_back
-	);
-}
 
 
 /**
