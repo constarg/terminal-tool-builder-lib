@@ -134,32 +134,32 @@ int initialize_help(struct builder_d *c_builder, const char *tool_name)
 	return add_help_tool_alias(c_builder, "--help");
 }
 
-int add_help_tool_description(struct builder_d *c_builder, const char *description)
+int add_help_tool_description(struct builder_d *c_builder, const char *c_description)
 {
 	if (c_builder == NULL || c_builder->b_help == NULL) return BUILDER_IS_NOT_INITIALIZED;
 
 	struct help_d *(*help_tmp) = &c_builder->b_help; 
-	(*help_tmp)->h_description = malloc(sizeof(char) * strlen(description) + 1);
-	strcpy((*help_tmp)->h_description, description);
+	(*help_tmp)->h_description = (char *) malloc(sizeof(char) * strlen(c_description) + 1);
+	strcpy((*help_tmp)->h_description, c_description);
 	
 	return 0;
 }
 
 
-int add_help_tool_command(struct builder_d *c_builder, const char *command_name, 
-			  const char *command_description)
+int add_help_tool_command(struct builder_d *c_builder, const char c_name[256], 
+			  const char *c_description)
 {
 	if (c_builder == NULL || c_builder->b_help == NULL) return BUILDER_IS_NOT_INITIALIZED;
 
-	struct command_help *new_command_h = malloc(sizeof(struct command_help)); 
-	new_command_h->c_name = malloc(sizeof(char) * (strlen(command_name) + 1));
-	new_command_h->c_description = malloc(sizeof(char) * (strlen(command_description) + 1));
+	struct command_help *new_command_h = (struct command_help *) malloc(sizeof(struct command_help)); 
+	new_command_h->c_name = (char *) malloc(sizeof(char) * (strlen(c_name) + 1));
+	new_command_h->c_description = (char *) malloc(sizeof(char) * (strlen(c_description) + 1));
 	if (new_command_h->c_name == NULL || new_command_h->c_description == NULL)
 		return FAILED_TO_ADD;
 	
 	// Copy the contents.
-	strcpy(new_command_h->c_name, command_name);
-	strcpy(new_command_h->c_description, command_description);	
+	strcpy(new_command_h->c_name, c_name);
+	strcpy(new_command_h->c_description, c_description);	
 
 	int last_c = c_builder->b_help->h_commandsc;
 	c_builder->b_help->h_commands = (struct command_help **) realloc(c_builder->b_help->h_commands,
@@ -222,14 +222,14 @@ int add_command(struct builder_d *c_builder, const char c_name[256], int c_argc,
 	return 0;
 }
 
-int add_command_alias(struct builder_d *c_builder, const char *c_name, 
+int add_command_alias(struct builder_d *c_builder, const char c_name[256], 
 		      const char *c_alias, ...) 
 {
 	// TODO - Get the alias and set them into the ascociated command.
 }
 
 
-int add_action(struct builder_d *c_builder, const char *c_name,
+int add_action(struct builder_d *c_builder, const char c_name[256],
 	       void (*c_call_back)(const struct exec_info *info))
 {
 	if (c_builder == NULL || c_builder->b_commands == NULL) return BUILDER_IS_NOT_INITIALIZED;

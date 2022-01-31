@@ -163,7 +163,7 @@ extern int add_command_alias(struct builder_d *c_builder, const char c_name[256]
 	all the erros are defined as MACROS.
 	
 */
-extern int add_action(struct builder_d *c_builder, const char *c_name, 
+extern int add_action(struct builder_d *c_builder, const char c_name[256], 
 		      void (*c_call_back)(const struct exec_info *info));
 
 
@@ -198,7 +198,7 @@ static int inline add_command_both(struct builder_d *c_builder, const char c_nam
 		c_argc,
 		c_call_back
 	);
-	if (error == 0) return error;
+	if (error != 0) return error;
 
 	return add_help_tool_command(
 		c_builder,
