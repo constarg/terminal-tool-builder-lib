@@ -85,7 +85,7 @@ extern int initialize_help(struct builder_d *c_builder, const char *tool_name);
 	all the erros are defined as MACROS.
 
 */
-extern int add_help_tool_description(struct builder_d *c_builder, const char *description);
+extern int add_help_tool_description(struct builder_d *c_builder, const char *c_description);
 
 /**
 	Adds to the help action a command and the description
@@ -99,15 +99,15 @@ extern int add_help_tool_description(struct builder_d *c_builder, const char *de
 	all the erros are defined as MACROS.
 
 */
-extern int add_help_tool_command(struct builder_d *c_builder, const char *command_name,
-				 const char *command_description);
+extern int add_help_tool_command(struct builder_d *c_builder, const char c_name[256],
+				 const char *c_description);
 
 /**
 	Adds alias to the help docs
 	@param c_builder The builder of the tool.
 	@param c_name The name of the command in docs.
 */
-extern int add_help_tool_alias(struct builder_d *c_builder, const char *c_name);
+extern int add_help_tool_alias(struct builder_d *c_builder, const char c_name[256]);
 
 /**
 	Adds a description in the end of the help message.
@@ -148,7 +148,7 @@ extern int add_command(struct builder_d *c_builder, const char c_name[256],
 	number of alias.
 	 
 */
-extern int add_command_alias(struct builder_d *c_builder, const char *c_name, const char *c_alias, ...);
+extern int add_command_alias(struct builder_d *c_builder, const char c_name[256], const char *c_alias, ...);
 
 /**
 	Set or change the callback function of a specific
@@ -185,6 +185,46 @@ extern int add_action(struct builder_d *c_builder, const char *c_name,
 */
 int execute_command(int argc, char *argv[], const struct builder_d *c_builder);
 
+
+
+static int inline add_command_both(struct builder_d *c_builder, const char c_name[256], 
+			int c_argc, void (*c_call_back)(const struct exec_info *info),
+			const char *c_description)
+{
+	
+	int error = add_command(
+		c_builder,
+		c_name,
+		c_argc,
+		c_call_back
+	);
+	if (error == 0) return error;
+
+	return add_help_tool_command(
+		c_builder,
+		c_name,
+		c_description
+	);
+
+}
+
+static int inline add_command_alias_both(struct builder_d *c_builder, const char c_name[256], 
+					const char *c_alias, ...)
+{
+	
+	int error = add_command_alias(
+		c_builder,
+		c_name,
+		c_alias
+	);
+	if (error != 0) return error;
+	
+
+	return add_help_tool_alias(
+		c_builder,
+		c_name
+	);
+}
 
 
 #endif
