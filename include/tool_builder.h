@@ -35,8 +35,8 @@ struct builder_d
 
 struct exec_info 
 {
-	char c_name[256];					// The name of the command that has been executed.
-	char c_used_alias[256];					// The alias that has been used.
+	char *c_name;						// The name of the command that has been executed.
+	char *c_used_alias;					// The alias that has been used.
 	char *(*c_values);					// The values that the been retrieved. Must be freed when there is no more use.
 	int c_argc;						// The arguments of the command.
 	struct builder_d *c_builder;				// The builder.
@@ -99,7 +99,7 @@ extern int add_help_tool_description(struct builder_d *c_builder, const char *c_
 	all the erros are defined as MACROS.
 
 */
-extern int add_help_tool_command(struct builder_d *c_builder, const char c_name[256],
+extern int add_help_tool_command(struct builder_d *c_builder, const char *c_name,
 				 const char *c_description);
 
 /**
@@ -107,7 +107,7 @@ extern int add_help_tool_command(struct builder_d *c_builder, const char c_name[
 	@param c_builder The builder of the tool.
 	@param c_name The name of the command in docs.
 */
-extern int add_help_tool_alias(struct builder_d *c_builder, const char c_name[256]);
+extern int add_help_tool_alias(struct builder_d *c_builder, const char *c_name);
 
 /**
 	Adds a description in the end of the help message.
@@ -136,7 +136,7 @@ extern int add_help_tool_closing_description(struct builder_d *c_builder, const 
 	all the erros are defined as MACROS.
 
 */
-extern int add_command(struct builder_d *c_builder, const char c_name[256], 
+extern int add_command(struct builder_d *c_builder, const char *c_name, 
 			int c_argc, void (*c_call_back)(const struct exec_info *info));
 
 
@@ -148,7 +148,7 @@ extern int add_command(struct builder_d *c_builder, const char c_name[256],
 	number of alias.
 	 
 */
-extern int add_command_alias(struct builder_d *c_builder, const char c_name[256], const char *c_alias, ...);
+extern int add_command_alias(struct builder_d *c_builder, const char *c_name, const char *c_alias, ...);
 
 /**
 	Set or change the callback function of a specific
@@ -163,7 +163,7 @@ extern int add_command_alias(struct builder_d *c_builder, const char c_name[256]
 	all the erros are defined as MACROS.
 	
 */
-extern int add_action(struct builder_d *c_builder, const char c_name[256], 
+extern int add_action(struct builder_d *c_builder, const char *c_name, 
 		      void (*c_call_back)(const struct exec_info *info));
 
 
@@ -187,7 +187,7 @@ int execute_command(int argc, char *argv[], const struct builder_d *c_builder);
 
 
 
-static int inline add_command_both(struct builder_d *c_builder, const char c_name[256], 
+static int inline add_command_both(struct builder_d *c_builder, const char *c_name, 
 			int c_argc, void (*c_call_back)(const struct exec_info *info),
 			const char *c_description)
 {
@@ -208,7 +208,7 @@ static int inline add_command_both(struct builder_d *c_builder, const char c_nam
 
 }
 
-static int inline add_command_alias_both(struct builder_d *c_builder, const char c_name[256], 
+static int inline add_command_alias_both(struct builder_d *c_builder, const char *c_name, 
 					const char *c_alias, ...)
 {
 	

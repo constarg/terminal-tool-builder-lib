@@ -23,9 +23,9 @@ struct help_d
 
 struct command_d 
 {
-	char c_name[256];					// The name of the command.
+	char *c_name;						// The name of the command.
 	int c_argc;						// How many argcs the command require.
-	char *(*c_alias);						// The alias of the commnad. 5 is the maximum number of alias.
+	char *(*c_alias);					// The alias of the commnad. 5 is the maximum number of alias.
 	/**
 		This callback is user defined and is executed
 		when the user request a call of the specific
@@ -77,7 +77,7 @@ void destroy_builder(struct builder_d **c_builder)
 	// Free the memory for the commands.
 	for (int c = 0; c < (*c_builder)->b_commandsc; c++) 
 	{
-		// TODO - destroy alias.
+		free((*c_builder)->b_commands[c]->c_name);
 		free((*c_builder)->b_commands[c]);
 	}
 	free((*c_builder)->b_commands);
@@ -85,7 +85,6 @@ void destroy_builder(struct builder_d **c_builder)
 	// Free help.
 	for (int h = 0; h < (*c_builder)->b_help->h_commandsc; h++) 
 	{
-		// TODO - destroy alias.
 		free((*c_builder)->b_help->h_commands[h]->c_name);
 		free((*c_builder)->b_help->h_commands[h]->c_description);
 		free((*c_builder)->b_help->h_commands[h]);
@@ -146,7 +145,7 @@ int add_help_tool_description(struct builder_d *c_builder, const char *c_descrip
 }
 
 
-int add_help_tool_command(struct builder_d *c_builder, const char c_name[256], 
+int add_help_tool_command(struct builder_d *c_builder, const char *c_name, 
 			  const char *c_description)
 {
 	if (c_builder == NULL || c_builder->b_help == NULL) return BUILDER_IS_NOT_INITIALIZED;
@@ -203,14 +202,15 @@ int add_help_tool_closing_description(struct builder_d *c_builder, const char *c
 	return 0;
 }
 
-int add_command(struct builder_d *c_builder, const char c_name[256], int c_argc,  
+int add_command(struct builder_d *c_builder, const char *c_name, int c_argc,  
 		 void (*c_call_back)(const struct exec_info *info))
 {
 	if (c_builder == NULL) return BUILDER_IS_NOT_INITIALIZED;
 
 	// Allocate memory for the new command.
 	int last_c = c_builder->b_commandsc;
-	struct command_d *new_command = (struct command_d *) malloc(sizeof(struct command_d));
+	struct command_d *new_command = (struct command_d *) calloc(1, sizeof(struct command_d));
+	new_command->c_name = (char *) malloc(sizeof(char) * (strlen(c_name) + 1));
 	strcpy(new_command->c_name, c_name);
 	new_command->c_argc = c_argc;
 	
@@ -222,14 +222,14 @@ int add_command(struct builder_d *c_builder, const char c_name[256], int c_argc,
 	return 0;
 }
 
-int add_command_alias(struct builder_d *c_builder, const char c_name[256], 
+int add_command_alias(struct builder_d *c_builder, const char *c_name, 
 		      const char *c_alias, ...) 
 {
 	// TODO - Get the alias and set them into the ascociated command.
 }
 
 
-int add_action(struct builder_d *c_builder, const char c_name[256],
+int add_action(struct builder_d *c_builder, const char *c_name,
 	       void (*c_call_back)(const struct exec_info *info))
 {
 	if (c_builder == NULL || c_builder->b_commands == NULL) return BUILDER_IS_NOT_INITIALIZED;
@@ -287,8 +287,8 @@ int execute_command(int argc, char *argv[], const struct builder_d *c_builder)
 
 	// Build the info to recieve the call back.
 	struct exec_info exec_inf;
-	strcpy(exec_inf.c_name, command->c_name);
-	strcpy(exec_inf.c_used_alias, argv[1]);
+	exec_inf.c_name = command->c_name;
+	exec_inf.c_used_alias = argv[1];
 	exec_inf.c_values = (argv + 2);	// This points to the first argument of the requested command. 
 	exec_inf.c_argc = command->c_argc;
 	exec_inf.c_builder = (struct builder_d *) c_builder;

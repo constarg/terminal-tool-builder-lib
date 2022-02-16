@@ -59,7 +59,7 @@ int main(int argc, char *argv[]) {
 	);
 
 
-	add_command_alias(builder, "Testing", "Test", "t", "te", NULL); 
+	//add_command_alias(builder, "Testing", "Test", "t", "te", NULL); 
 
 	int error = execute_command(argc, argv, builder);
 	printf("Error = %d\n", error);
