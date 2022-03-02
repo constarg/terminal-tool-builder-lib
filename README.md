@@ -136,3 +136,6 @@ add_command_alias_both(builder, "command_name", "alias_1", "alias_2", "alias_3",
 ```
 The `add_command_alias_both` function takes 2 parameters and an unlimited number of aliases. The first parameter is the builder, the second is the name of the command you want to add the aliases and the rest is the aliases. The defferent with this function is that it will also add the aliases in the docs.<br>
 **Cation!!! the last alias must be NULL!**
+
+## Example
+An example of the library in use can be found in the **tests** folder
