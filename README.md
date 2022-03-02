@@ -145,6 +145,13 @@ execute_command(argc, argv, builder);
 The `execute_command` function has 3 parameters. The first parameter is the argc of main, the second is the argv of main and the third is the builder.
 This function is responsible for the determination of what command has been given from the terminal and also is the function that calls the callback of the command thet has been requested.
 
+## Destroying
+Once you have completed all the procedures you have to do with the builder you should free up the memory that the library is freeing up. To do this you can call the following function. 
+```C
+destroy_builder(builder);
+```
+The `destroy_builder` function free's the memory that has been allocated for the builder. It has only one parameter and is the builder. 
+
 ## Example
 An example of the library in use can be found in the **tests** folder
 
