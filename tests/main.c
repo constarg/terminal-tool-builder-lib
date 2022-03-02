@@ -35,14 +35,14 @@ int main(int argc, char *argv[]) {
 	initialize_builder(&builder);
 
 
-	//initialize_help(builder, "Testing-tool");
+	initialize_help(builder, "Testing-tool");
 
 	// Add description to the docs of help.
-	//add_help_tool_description(builder, "This is a test of a description");	
+	add_help_tool_description(builder, "This is a test of a description");	
 	
 	
 	// Add a new command to the docs of help.
-	//add_help_tool_command(builder, "Testing", "This command is a test command");
+	add_help_tool_command(builder, "Testing", "This command is a test command");
 
 	add_command(
 		builder,
@@ -59,7 +59,9 @@ int main(int argc, char *argv[]) {
 	);
 
 
-	//add_command_alias(builder, "Testing", "Test", "t", "te", NULL); 
+	add_command_alias(builder, "Testing", "Test", "t", "te", NULL); 
+	add_help_tool_alias(builder, "Testing");
+	
 
 	int error = execute_command(argc, argv, builder);
 	printf("Error = %d\n", error);

@@ -26,6 +26,7 @@ struct command_d
 	char *c_name;						// The name of the command.
 	int c_argc;						// How many argcs the command require.
 	char *(*c_alias);					// The alias of the commnad. 5 is the maximum number of alias.
+	int c_alias_c;
 	/**
 		This callback is user defined and is executed
 		when the user request a call of the specific
@@ -74,14 +75,6 @@ void initialize_builder(struct builder_d **c_builder)
 
 void destroy_builder(struct builder_d **c_builder)
 {
-	// Free the memory for the commands.
-	for (int c = 0; c < (*c_builder)->b_commandsc; c++) 
-	{
-		free((*c_builder)->b_commands[c]->c_name);
-		free((*c_builder)->b_commands[c]);
-	}
-	free((*c_builder)->b_commands);
-	
 	// Free help.
 	for (int h = 0; h < (*c_builder)->b_help->h_commandsc; h++) 
 	{
@@ -94,6 +87,18 @@ void destroy_builder(struct builder_d **c_builder)
 	free((*c_builder)->b_help->h_description);
 	free((*c_builder)->b_help);
 
+	// Free the memory for the commands.
+	for (int c = 0; c < (*c_builder)->b_commandsc; c++) 
+	{
+		free((*c_builder)->b_commands[c]->c_name);
+		for (int a = 0; a < (*c_builder)->b_commands[c]->c_alias_c; a++)
+			free((*c_builder)->b_commands[c]->c_alias[a]);
+		free((*c_builder)->b_commands[c]->c_alias);
+		free((*c_builder)->b_commands[c]);
+	}
+	free((*c_builder)->b_commands);
+	
+	
 	// Free builder.
 	free(*c_builder);
 	*c_builder = NULL;
@@ -126,11 +131,7 @@ int initialize_help(struct builder_d *c_builder, const char *tool_name)
 	); 
 	if (error != 0) return error;
 
-	// help alias.
-	error = add_command_alias(c_builder, "--help", "-h", NULL);
-	if (error != 0) return error;
-
-	return add_help_tool_alias(c_builder, "--help");
+	return add_command_alias(c_builder, "--help","-h", NULL);
 }
 
 int add_help_tool_description(struct builder_d *c_builder, const char *c_description)
@@ -182,7 +183,7 @@ int add_help_tool_alias(struct builder_d *c_builder, const char *c_name)
 						 c_name, c_builder->b_commandsc);
 	if (c_found == NULL) return NO_SUCH_COMMAND_EXISTS;
 
-	for (int h = 0; h <c_builder->b_help->h_commandsc; h++)
+	for (int h = 0; h < c_builder->b_help->h_commandsc; h++)
 	{
 		if (!strcmp(c_builder->b_help->h_commands[h]->c_name, c_found->c_name))
 			c_builder->b_help->h_commands[h]->c_alias = c_found->c_alias;
@@ -225,7 +226,39 @@ int add_command(struct builder_d *c_builder, const char *c_name, int c_argc,
 int add_command_alias(struct builder_d *c_builder, const char *c_name, 
 		      const char *c_alias, ...) 
 {
-	// TODO - Get the alias and set them into the ascociated command.
+	struct command_d *command = find_command((const struct command_d **) c_builder->b_commands, 
+						c_name, c_builder->b_commandsc);
+
+	if (command == NULL) return NO_SUCH_COMMAND_EXISTS;
+	if (c_alias == NULL) return -1;
+
+	command->c_alias = (char **) calloc(1, sizeof(char *));
+	command->c_alias_c = 0; // initialize count.	
+	if (command->c_alias == NULL) FAILED_TO_ADD;
+
+	// the list of alias.
+	va_list alias_list;
+	va_start(alias_list, c_alias);
+
+	char *tmp_a = (char *) c_alias;
+	while(tmp_a)
+	{
+		// allocate space for the curr alias.
+		command->c_alias[command->c_alias_c] = (char *) malloc(sizeof(char) *
+							      (strlen(tmp_a) + 1));
+		// copy the alias.
+		strcpy(command->c_alias[command->c_alias_c], tmp_a);
+		// increase the aliases.
+		command->c_alias = (char **) realloc(command->c_alias, 
+						     (++command->c_alias_c + 1) * sizeof(char *));
+		tmp_a = va_arg(alias_list, char*);
+	}
+
+	// null terminate the alias.
+	command->c_alias[command->c_alias_c] = NULL;
+	va_end(alias_list);
+
+	return 0;
 }
 
 
