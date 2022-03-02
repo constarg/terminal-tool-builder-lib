@@ -137,5 +137,13 @@ add_command_alias_both(builder, "command_name", "alias_1", "alias_2", "alias_3",
 The `add_command_alias_both` function takes 2 parameters and an unlimited number of aliases. The first parameter is the builder, the second is the name of the command you want to add the aliases and the rest is the aliases. The defferent with this function is that it will also add the aliases in the docs.<br>
 **Cation!!! the last alias must be NULL!**
 
+## Execution
+To execute the command that the user has typed you have to call the below function in the main.
+```C
+execute_command(argc, argv, builder);
+```
+The `execute_command` function has 3 parameters. The first parameter is the argc of main, the second is the argv of main and the third is the builder.
+This function is responsible for the determination of what command has been given from the terminal and also is the function that calls the callback of the command thet has been requested.
+
 ## Example
 An example of the library in use can be found in the **tests** folder
