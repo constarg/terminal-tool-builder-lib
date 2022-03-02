@@ -86,7 +86,7 @@ The `add_help_tool_alias` the first parameter of this function is the builder an
 ## Commands
 To set a new command for the tool you are creating, all you have to do is call the following function. 
 ```C
-add_command(builder, "command_name", arg, &action);
+add_command(builder, "command_name", arg, action);
             ^           ^            ^      ^
         The builder  Command       args   action
 ```
