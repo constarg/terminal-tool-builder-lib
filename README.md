@@ -147,3 +147,6 @@ This function is responsible for the determination of what command has been give
 
 ## Example
 An example of the library in use can be found in the **tests** folder
+
+## Done!
+This is my library, I hope you find it useful. Any contribution or any proposal for change is acceptable!! 
