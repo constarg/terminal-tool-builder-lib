@@ -146,7 +146,7 @@ The `execute_command` function has 3 parameters. The first parameter is the argc
 This function is responsible for the determination of what command has been given from the terminal and also is the function that calls the callback of the command thet has been requested.
 
 ## Destroying
-Once you have completed all the procedures you have to do with the builder you should free up the memory that the library is freeing up. To do this you can call the following function. 
+Once you have completed all the procedures you have to do with the builder you should free up the memory that the library is using. To do this you can call the following function. 
 ```C
 destroy_builder(builder);
 ```
