@@ -82,6 +82,7 @@ void destroy_builder(struct builder_d **c_builder)
 		free((*c_builder)->b_help->h_commands[h]->c_description);
 		free((*c_builder)->b_help->h_commands[h]);
 	}	
+	free((*c_builder)->b_help->h_commands);
 	free((*c_builder)->b_help->h_usage_sec);
 	free((*c_builder)->b_help->h_close_description);
 	free((*c_builder)->b_help->h_description);
