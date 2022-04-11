@@ -148,7 +148,7 @@ This function is responsible for the determination of what command has been give
 ## Destroying
 Once you have completed all the procedures you have to do with the builder you should free up the memory that the library is using. To do this you can call the following function. 
 ```C
-destroy_builder(builder);
+destroy_builder(&builder);
 ```
 The `destroy_builder` function free's the memory that has been allocated for the builder. It has only one parameter and is the builder. 
 
