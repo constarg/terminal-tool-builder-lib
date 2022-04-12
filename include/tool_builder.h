@@ -4,37 +4,42 @@
 #include <malloc.h>
 #include <string.h>
 
-#define TOOL_BUILDER_V 			 1.0
+#define TOOL_BUILDER_V 				 1.0
 
 // errors
-#define WRONG_ARG_NUM			-1
-#define WRONG_NAME_OR_ALIAS		-2
+#define TOOL_BUILDER_WRONG_ARG_NUM		-1
+#define TOOL_BUILDER_WRONG_NAME_OR_ALIAS	-2
 
-#define EMPTY_NAME			-3
+#define TOOL_BUILDER_EMPTY_NAME			-3
 
-#define NO_ACTION_DEFINED		-4
+#define TOOL_BUILDER_NO_ACTION_DEFINED		-4
 
-#define FAILED_TO_ADD			-5
-#define BUILDER_IS_NOT_INITIALIZED	-6
+#define TOOL_BUILDER_FAILED_TO_ADD		-5
+#define TOOL_BUILDER_IS_NOT_INITIALIZED		-6
 
-#define NO_SUCH_COMMAND_EXISTS		-7
+#define TOOL_BUILDER_NO_SUCH_COMMAND_EXISTS	-7
 
-#define UNITIALIZED_HELP		-8
+#define TOOL_BUILDER_UNITIALIZED_HELP		-8
 
 
-struct command_help;
-struct help_d; 
-struct command_d; 
+struct tool_builder_c_help; 					// command help
+struct tool_builder_help;   					// help struct.
+struct tool_builder_command; 
 
-struct builder_d;
+struct tool_builder 
+{
+	struct tool_builder_command **b_commands;		// array of commands.
+	int b_commandsc;					// The number of the commands.
+	struct tool_builder_help *b_help;			// The help of the tool.
+};
 
-struct exec_info 
+struct tool_builder_args 
 {
 	char *c_name;						// The name of the command that has been executed.
 	char *c_used_alias;					// The alias that has been used.
 	char *(*c_values);					// The values that the been retrieved. Must be freed when there is no more use.
 	int c_argc;						// The arguments of the command.
-	struct builder_d *c_builder;				// The builder.
+	struct tool_builder *c_builder;				// The builder.
 };
 
 
@@ -48,13 +53,13 @@ struct exec_info
 	function must be collled.
 	@param c_builder The builder.
 */
-extern void initialize_builder(struct builder_d **c_builder);
+extern void tool_builder_init(struct tool_builder *c_builder);
 
 /**
 	Free the memory that has been allocated for the builder.
 	@param c_builder The builder to destroy.
 */
-extern void destroy_builder(struct builder_d **c_builder);
+extern void tool_builder_destroy(struct tool_builder *c_builder);
 
 /**
 	Builds a basic help action that prints informations
@@ -68,7 +73,7 @@ extern void destroy_builder(struct builder_d **c_builder);
 	all the erros are defined as MACROS.
 
 */
-extern int initialize_help(struct builder_d *c_builder, const char *tool_name);
+extern int tool_builder_init_help(struct tool_builder *c_builder, const char *tool_name);
 
 /**
 	Adds description to the help message.
@@ -80,7 +85,7 @@ extern int initialize_help(struct builder_d *c_builder, const char *tool_name);
 	all the erros are defined as MACROS.
 
 */
-extern int add_help_tool_description(struct builder_d *c_builder, const char *c_description);
+extern int tool_builder_set_desc(struct tool_builder *c_builder, const char *c_description);
 
 /**
 	Adds to the help action a command and the description
@@ -94,15 +99,15 @@ extern int add_help_tool_description(struct builder_d *c_builder, const char *c_
 	all the erros are defined as MACROS.
 
 */
-extern int add_help_tool_command(struct builder_d *c_builder, const char *c_name,
-				 const char *c_description);
+extern int tool_builder_set_command_desc(struct tool_builder *c_builder, const char *c_name,
+				 	 const char *c_description);
 
 /**
 	Adds alias to the help docs
 	@param c_builder The builder of the tool.
 	@param c_name The name of the command in docs.
 */
-extern int add_help_tool_alias(struct builder_d *c_builder, const char *c_name);
+extern int tool_builder_add_tool_alias(struct tool_builder *c_builder, const char *c_name);
 
 /**
 	Adds a description in the end of the help message.
@@ -116,7 +121,7 @@ extern int add_help_tool_alias(struct builder_d *c_builder, const char *c_name);
 	all the erros are defined as MACROS.
 
 */
-extern int add_help_tool_closing_description(struct builder_d *c_builder, const char *close_description);
+extern int tool_builder_set_closing_desc(struct tool_builder *c_builder, const char *close_description);
 
 /**
 	Adds a new command.
@@ -124,15 +129,15 @@ extern int add_help_tool_closing_description(struct builder_d *c_builder, const 
 	@param c_name The name of the command.
 	@param c_argc The arguments of the command.
 	@param c_alias The alias of the command.
-	@param c_call_back The callback that is executed then the command is requested.
+	@param c_callback The callback that is executed then the command is requested.
 	@return 0 on success or an integer error number on error.
 	errors:
 `		builder is not initialized: -6
 	all the erros are defined as MACROS.
 
 */
-extern int add_command(struct builder_d *c_builder, const char *c_name, 
-			int c_argc, void (*c_call_back)(const struct exec_info *info));
+extern int tool_builder_add_command(struct tool_builder *c_builder, const char *c_name, 
+				    int c_argc, void (*c_callback)(const struct tool_builder_args *info));
 
 
 /**
@@ -143,14 +148,14 @@ extern int add_command(struct builder_d *c_builder, const char *c_name,
 	number of alias.
 	 
 */
-extern int add_command_alias(struct builder_d *c_builder, const char *c_name, const char *c_alias, ...);
+extern int tool_builder_add_alias(struct tool_builder *c_builder, const char *c_name, const char *c_alias, ...);
 
 /**
 	Set or change the callback function of a specific
 	command.
 	@param c_builder The builder.
 	@param c_name	The name of the command.
-	@param c_call_back The callback function to set or change with.
+	@param c_callback The callback function to set or change with.
 	@return 0 on success or an integer error number on error.
 	errors:
 		no such command exists: -7
@@ -158,8 +163,8 @@ extern int add_command_alias(struct builder_d *c_builder, const char *c_name, co
 	all the erros are defined as MACROS.
 	
 */
-extern int add_action(struct builder_d *c_builder, const char *c_name, 
-		      void (*c_call_back)(const struct exec_info *info));
+extern int tool_builder_set_action(struct tool_builder *c_builder, const char *c_name, 
+		     		   void (*c_callback)(const struct tool_builder_args *info));
 
 
 /**
@@ -178,24 +183,24 @@ extern int add_action(struct builder_d *c_builder, const char *c_name,
 		
 	each error has a MACRO that can be used in if statements.
 */
-int execute_command(int argc, char *argv[], const struct builder_d *c_builder);
+int tool_builder_execute(int argc, char *argv[], const struct tool_builder *c_builder);
 
 
 
-static int inline add_command_both(struct builder_d *c_builder, const char *c_name, 
-			int c_argc, void (*c_call_back)(const struct exec_info *info),
-			const char *c_description)
+static int inline tool_builder_add_both(struct tool_builder *c_builder, const char *c_name, 
+					int c_argc, void (*c_callback)(const struct tool_builder_args *info),
+					const char *c_description)
 {
 	
-	int error = add_command(
+	int error = tool_builder_add_command(
 		c_builder,
 		c_name,
 		c_argc,
-		c_call_back
+		c_callback
 	);
 	if (error != 0) return error;
 
-	return add_help_tool_command(
+	return tool_builder_set_command_desc(
 		c_builder,
 		c_name,
 		c_description
@@ -203,11 +208,11 @@ static int inline add_command_both(struct builder_d *c_builder, const char *c_na
 
 }
 
-static int inline add_command_alias_both(struct builder_d *c_builder, const char *c_name, 
-					const char *c_alias, ...)
+static int inline tool_builder_add_alias_both(struct tool_builder *c_builder, const char *c_name, 
+					      const char *c_alias, ...)
 {
 	
-	int error = add_command_alias(
+	int error = tool_builder_add_alias(
 		c_builder,
 		c_name,
 		c_alias
@@ -215,7 +220,7 @@ static int inline add_command_alias_both(struct builder_d *c_builder, const char
 	if (error != 0) return error;
 	
 
-	return add_help_tool_alias(
+	return tool_builder_add_tool_alias(
 		c_builder,
 		c_name
 	);

@@ -5,27 +5,27 @@
 
 
 // Priavte implementation of structs.
-struct command_help 
+struct tool_builder_c_help 
 {
-	char *c_name;						// The name of the command.
-	char *(*c_alias);					// The alias of the command.
-	char *c_description;					// The description of the command.
+	char *c_name;							// The name of the command.
+	char *(*c_alias);						// The alias of the command.
+	char *c_description;						// The description of the command.
 };
 
-struct help_d 
+struct tool_builder_help 
 {
-	char *h_usage_sec;					// The useage section. example: Usage: tool_name [OPTION]...
-	char *h_description;					// The description of the help.
-	struct command_help **h_commands;			// The commands of the help.
-	char *h_close_description;				// The closure description.
-	int h_commandsc;					// The number of commands in help.
+	char *h_usage_sec;						// The useage section. example: Usage: tool_name [OPTION]...
+	char *h_description;						// The description of the help.
+	struct tool_builder_c_help **h_commands;			// The commands of the help.
+	char *h_close_description;					// The closure description.
+	int h_commandsc;						// The number of commands in help.
 };
 
-struct command_d 
+struct tool_builder_command 
 {
-	char *c_name;						// The name of the command.
-	int c_argc;						// How many argcs the command require.
-	char *(*c_alias);					// The alias of the commnad. 5 is the maximum number of alias.
+	char *c_name;							// The name of the command.
+	int c_argc;							// How many argcs the command require.
+	char *(*c_alias);						// The alias of the commnad. 5 is the maximum number of alias.
 	int c_alias_c;
 	/**
 		This callback is user defined and is executed
@@ -35,31 +35,24 @@ struct command_d
 		retrieved from the terminal when the command
 		was called.
 	*/
-	void (*c_call_back)(const struct exec_info *info);	// The action to take when the command has been requested.
+	void (*c_callback)(const struct tool_builder_args *info);	// The action to take when the command has been requested.
 };
 
 
-struct builder_d 
-{
-	struct command_d **b_commands;				// array of commands.
-	int b_commandsc;					// The number of the commands.
-	struct help_d *b_help;					// The help of the tool.
-};
-
-static inline struct command_d *find_command(const struct command_d **commands, const char *c_name,
+static inline struct tool_builder_command *find_command(const struct tool_builder_command **commands, const char *c_name,
 					     int commandsc);
 
-static void help_defualt_action(const struct exec_info *info)
+static void help_defualt_action(const struct tool_builder_args *info)
 {
 	// Prints the help message.
-	struct builder_d *builder = info->c_builder;
+	struct tool_builder *builder = info->c_builder;
 	if (builder == NULL || builder->b_help == NULL) return;
 	printf("%s\n", builder->b_help->h_usage_sec);
 	
 	if (builder->b_help->h_description == NULL) goto skip_dec;
 	printf("%s\n\n\n", builder->b_help->h_description);
 skip_dec:	
-	struct command_help **commands_h = builder->b_help->h_commands;
+	struct tool_builder_c_help **commands_h = builder->b_help->h_commands;
 	for (int h = 0; h < builder->b_help->h_commandsc; h++)
 	{
 		printf("\t%s", commands_h[h]->c_name);
@@ -72,50 +65,44 @@ skip_dec:
 	printf("%s\n", builder->b_help->h_close_description);
 }
 
-void initialize_builder(struct builder_d **c_builder)
+void tool_builder_init(struct tool_builder *c_builder)
 {
-	*c_builder = (struct builder_d *) malloc(sizeof(struct builder_d));
-	(*c_builder)->b_commands = (struct command_d **) calloc(1, sizeof(struct command_d **));
-	(*c_builder)->b_help = (struct help_d *) calloc(1, sizeof(struct help_d));
-	(*c_builder)->b_commandsc = 0;
+	c_builder->b_commands = (struct tool_builder_command **) calloc(1, sizeof(struct tool_builder_command **));
+	c_builder->b_help = (struct tool_builder_help *) calloc(1, sizeof(struct tool_builder_help));
+	c_builder->b_commandsc = 0;
 }
 
-void destroy_builder(struct builder_d **c_builder)
+void tool_builder_destroy(struct tool_builder *c_builder)
 {
 	// Free help.
-	for (int h = 0; h < (*c_builder)->b_help->h_commandsc; h++) 
+	for (int h = 0; h < c_builder->b_help->h_commandsc; h++) 
 	{
-		free((*c_builder)->b_help->h_commands[h]->c_name);
-		free((*c_builder)->b_help->h_commands[h]->c_description);
-		free((*c_builder)->b_help->h_commands[h]);
+		free(c_builder->b_help->h_commands[h]->c_name);
+		free(c_builder->b_help->h_commands[h]->c_description);
+		free(c_builder->b_help->h_commands[h]);
 	}	
-	free((*c_builder)->b_help->h_commands);
-	free((*c_builder)->b_help->h_usage_sec);
-	free((*c_builder)->b_help->h_close_description);
-	free((*c_builder)->b_help->h_description);
-	free((*c_builder)->b_help);
+	free(c_builder->b_help->h_commands);
+	free(c_builder->b_help->h_usage_sec);
+	free(c_builder->b_help->h_close_description);
+	free(c_builder->b_help->h_description);
+	free(c_builder->b_help);
 
 	// Free the memory for the commands.
-	for (int c = 0; c < (*c_builder)->b_commandsc; c++) 
+	for (int c = 0; c < c_builder->b_commandsc; c++) 
 	{
-		free((*c_builder)->b_commands[c]->c_name);
-		for (int a = 0; a < (*c_builder)->b_commands[c]->c_alias_c; a++)
-			free((*c_builder)->b_commands[c]->c_alias[a]);
-		free((*c_builder)->b_commands[c]->c_alias);
-		free((*c_builder)->b_commands[c]);
+		free(c_builder->b_commands[c]->c_name);
+		for (int a = 0; a < c_builder->b_commands[c]->c_alias_c; a++)
+			free(c_builder->b_commands[c]->c_alias[a]);
+		free(c_builder->b_commands[c]->c_alias);
+		free(c_builder->b_commands[c]);
 	}
-	free((*c_builder)->b_commands);
-	
-	
-	// Free builder.
-	free(*c_builder);
-	*c_builder = NULL;
+	free(c_builder->b_commands);
 }	
 
 
-int initialize_help(struct builder_d *c_builder, const char *tool_name)
+int tool_builder_init_help(struct tool_builder *c_builder, const char *tool_name)
 {
-	if (c_builder == NULL || c_builder->b_help == NULL) return BUILDER_IS_NOT_INITIALIZED;
+	if (c_builder == NULL || c_builder->b_help == NULL) return TOOL_BUILDER_IS_NOT_INITIALIZED;
 
 	const char *str_u_1 = "Usage:";
 	const char *str_u_2 = "[OPTION]...";
@@ -125,13 +112,13 @@ int initialize_help(struct builder_d *c_builder, const char *tool_name)
  
 	char *(*usage_sec) = &c_builder->b_help->h_usage_sec;
 	*usage_sec = malloc(sizeof(char) * usage_size);
-	if ((*usage_sec) == NULL) return FAILED_TO_ADD;
+	if ((*usage_sec) == NULL) return TOOL_BUILDER_FAILED_TO_ADD;
 	
 	sprintf((*usage_sec),"%s %s %s", str_u_1, tool_name, str_u_2);
 	
 	// Initialize help as a command.
 	// Add command.
-	int error = add_command(
+	int error = tool_builder_add_command(
 		c_builder,
 		"--help",
 		0,
@@ -139,14 +126,14 @@ int initialize_help(struct builder_d *c_builder, const char *tool_name)
 	); 
 	if (error != 0) return error;
 
-	return add_command_alias(c_builder, "--help","-h", NULL);
+	return tool_builder_add_alias(c_builder, "--help","-h", NULL);
 }
 
-int add_help_tool_description(struct builder_d *c_builder, const char *c_description)
+int tool_builder_set_desc(struct tool_builder *c_builder, const char *c_description)
 {
-	if (c_builder == NULL || c_builder->b_help == NULL) return BUILDER_IS_NOT_INITIALIZED;
+	if (c_builder == NULL || c_builder->b_help == NULL) return TOOL_BUILDER_IS_NOT_INITIALIZED;
 
-	struct help_d *(*help_tmp) = &c_builder->b_help;
+	struct tool_builder_help *(*help_tmp) = &c_builder->b_help;
 	(*help_tmp)->h_description = (char *) malloc(sizeof(char) * strlen(c_description) + 1);
 	strcpy((*help_tmp)->h_description, c_description);
 	
@@ -154,26 +141,26 @@ int add_help_tool_description(struct builder_d *c_builder, const char *c_descrip
 }
 
 
-int add_help_tool_command(struct builder_d *c_builder, const char *c_name, 
+int tool_builder_set_command_desc(struct tool_builder *c_builder, const char *c_name, 
 			  const char *c_description)
 {
-	if (c_builder == NULL || c_builder->b_help == NULL) return BUILDER_IS_NOT_INITIALIZED;
+	if (c_builder == NULL || c_builder->b_help == NULL) return TOOL_BUILDER_IS_NOT_INITIALIZED;
 
-	struct command_help *new_command_h = (struct command_help *) malloc(sizeof(struct command_help)); 
+	struct tool_builder_c_help *new_command_h = (struct tool_builder_c_help *) malloc(sizeof(struct tool_builder_c_help)); 
 	new_command_h->c_name = (char *) malloc(sizeof(char) * (strlen(c_name) + 1));
 	new_command_h->c_description = (char *) malloc(sizeof(char) * (strlen(c_description) + 1));
 	if (new_command_h->c_name == NULL || new_command_h->c_description == NULL)
-		return FAILED_TO_ADD;
+		return TOOL_BUILDER_FAILED_TO_ADD;
 	
 	// Copy the contents.
 	strcpy(new_command_h->c_name, c_name);
 	strcpy(new_command_h->c_description, c_description);	
 
 	int last_c = c_builder->b_help->h_commandsc;
-	c_builder->b_help->h_commands = (struct command_help **) realloc(c_builder->b_help->h_commands,
-									 sizeof(struct command_help *) * (last_c + 1));
+	c_builder->b_help->h_commands = (struct tool_builder_c_help **) realloc(c_builder->b_help->h_commands,
+									 	sizeof(struct tool_builder_c_help *) * (last_c + 1));
 	if (c_builder->b_help->h_commands == NULL)
-		return FAILED_TO_ADD;
+		return TOOL_BUILDER_FAILED_TO_ADD;
 
 	// Save the new command.
 	c_builder->b_help->h_commands[last_c] = new_command_h;
@@ -182,14 +169,14 @@ int add_help_tool_command(struct builder_d *c_builder, const char *c_name,
 	return 0;
 }
 
-int add_help_tool_alias(struct builder_d *c_builder, const char *c_name)
+int tool_builder_add_tool_alias(struct tool_builder *c_builder, const char *c_name)
 {
 	if (c_builder == NULL || c_builder->b_help == NULL)
-		return BUILDER_IS_NOT_INITIALIZED;
+		return TOOL_BUILDER_IS_NOT_INITIALIZED;
 
-	struct command_d *c_found = find_command((const struct command_d **) c_builder->b_commands,
-						 c_name, c_builder->b_commandsc);
-	if (c_found == NULL) return NO_SUCH_COMMAND_EXISTS;
+	struct tool_builder_command *c_found = find_command((const struct tool_builder_command **) c_builder->b_commands,
+						 	    c_name, c_builder->b_commandsc);
+	if (c_found == NULL) return TOOL_BUILDER_NO_SUCH_COMMAND_EXISTS;
 
 	for (int h = 0; h < c_builder->b_help->h_commandsc; h++)
 	{
@@ -198,51 +185,51 @@ int add_help_tool_alias(struct builder_d *c_builder, const char *c_name)
 	}
 }
 
-int add_help_tool_closing_description(struct builder_d *c_builder, const char *close_description)
+int tool_builder_set_closing_desc(struct tool_builder *c_builder, const char *close_description)
 {
-	if (c_builder == NULL || c_builder->b_help == NULL) return BUILDER_IS_NOT_INITIALIZED;
+	if (c_builder == NULL || c_builder->b_help == NULL) return TOOL_BUILDER_IS_NOT_INITIALIZED;
 
-	struct help_d *(*help_tmp) = &c_builder->b_help;
+	struct tool_builder_help *(*help_tmp) = &c_builder->b_help;
 
 	(*help_tmp)->h_close_description = (char *) malloc(sizeof(char) * (strlen(close_description) + 1));
-	if ((*help_tmp)->h_close_description == NULL) return FAILED_TO_ADD;
+	if ((*help_tmp)->h_close_description == NULL) return TOOL_BUILDER_FAILED_TO_ADD;
 	strcpy((*help_tmp)->h_close_description, close_description);
 	
 	return 0;
 }
 
-int add_command(struct builder_d *c_builder, const char *c_name, int c_argc,  
-		 void (*c_call_back)(const struct exec_info *info))
+int tool_builder_add_command(struct tool_builder *c_builder, const char *c_name, int c_argc,  
+		 void (*c_callback)(const struct tool_builder_args *info))
 {
-	if (c_builder == NULL) return BUILDER_IS_NOT_INITIALIZED;
+	if (c_builder == NULL) return TOOL_BUILDER_IS_NOT_INITIALIZED;
 
 	// Allocate memory for the new command.
 	int last_c = c_builder->b_commandsc;
-	struct command_d *new_command = (struct command_d *) calloc(1, sizeof(struct command_d));
+	struct tool_builder_command *new_command = (struct tool_builder_command *) calloc(1, sizeof(struct tool_builder_command));
 	new_command->c_name = (char *) malloc(sizeof(char) * (strlen(c_name) + 1));
 	strcpy(new_command->c_name, c_name);
 	new_command->c_argc = c_argc;
 	
-	new_command->c_call_back = c_call_back;
-	c_builder->b_commands = (struct command_d **) realloc(c_builder->b_commands, 
-							     sizeof(struct command_d *) * (last_c + 1));
+	new_command->c_callback = c_callback;
+	c_builder->b_commands = (struct tool_builder_command **) realloc(c_builder->b_commands, 
+							     		 sizeof(struct tool_builder_command *) * (last_c + 1));
 	c_builder->b_commands[last_c] = new_command;	
 	c_builder->b_commandsc += 1;
 	return 0;
 }
 
-int add_command_alias(struct builder_d *c_builder, const char *c_name, 
+int tool_builder_add_alias(struct tool_builder *c_builder, const char *c_name, 
 		      const char *c_alias, ...) 
 {
-	struct command_d *command = find_command((const struct command_d **) c_builder->b_commands, 
-						c_name, c_builder->b_commandsc);
+	struct tool_builder_command *command = find_command((const struct tool_builder_command **) c_builder->b_commands, 
+							    c_name, c_builder->b_commandsc);
 
-	if (command == NULL) return NO_SUCH_COMMAND_EXISTS;
+	if (command == NULL) return TOOL_BUILDER_NO_SUCH_COMMAND_EXISTS;
 	if (c_alias == NULL) return -1;
 
 	command->c_alias = (char **) calloc(1, sizeof(char *));
 	command->c_alias_c = 0; // initialize count.	
-	if (command->c_alias == NULL) FAILED_TO_ADD;
+	if (command->c_alias == NULL) TOOL_BUILDER_FAILED_TO_ADD;
 
 	// the list of alias.
 	va_list alias_list;
@@ -252,8 +239,7 @@ int add_command_alias(struct builder_d *c_builder, const char *c_name,
 	while(tmp_a)
 	{
 		// allocate space for the curr alias.
-		command->c_alias[command->c_alias_c] = (char *) malloc(sizeof(char) *
-							      (strlen(tmp_a) + 1));
+		command->c_alias[command->c_alias_c] = (char *) malloc(sizeof(char) * (strlen(tmp_a) + 1));
 		// copy the alias.
 		strcpy(command->c_alias[command->c_alias_c], tmp_a);
 		// increase the aliases.
@@ -270,19 +256,19 @@ int add_command_alias(struct builder_d *c_builder, const char *c_name,
 }
 
 
-int add_action(struct builder_d *c_builder, const char *c_name,
-	       void (*c_call_back)(const struct exec_info *info))
+int tool_builder_set_action(struct tool_builder *c_builder, const char *c_name,
+	       void (*c_callback)(const struct tool_builder_args *info))
 {
-	if (c_builder == NULL || c_builder->b_commands == NULL) return BUILDER_IS_NOT_INITIALIZED;
-	struct command_d *ch_command = find_command((const struct command_d **) c_builder->b_commands, c_name,
-						    c_builder->b_commandsc);
-	if (ch_command == NULL) return NO_SUCH_COMMAND_EXISTS;
-	ch_command->c_call_back = c_call_back;	// Set the requested callback.
+	if (c_builder == NULL || c_builder->b_commands == NULL) return TOOL_BUILDER_IS_NOT_INITIALIZED;
+	struct tool_builder_command *ch_command = find_command((const struct tool_builder_command **) c_builder->b_commands, c_name,
+						   	       c_builder->b_commandsc);
+	if (ch_command == NULL) return TOOL_BUILDER_NO_SUCH_COMMAND_EXISTS;
+	ch_command->c_callback = c_callback;	// Set the requested callback.
 	return 0;
 }
 
 
-static inline struct command_d *find_command(const struct command_d **commands, const char *c_name,
+static inline struct tool_builder_command *find_command(const struct tool_builder_command **commands, const char *c_name,
 					     int commandsc) 
 {
 
@@ -290,14 +276,14 @@ static inline struct command_d *find_command(const struct command_d **commands, 
 	{
 		if (commands[curr_c] == NULL) return NULL;
 		// Check if any of the names in the commands is the c_name.
-		if (!strcmp(commands[curr_c]->c_name, c_name)) return (struct command_d *) commands[curr_c];
+		if (!strcmp(commands[curr_c]->c_name, c_name)) return (struct tool_builder_command *) commands[curr_c];
 		else
 		{
 			// Check if any of the alias of the current command is the c_name.
 			if (commands[curr_c]->c_alias == NULL) continue;
 			for (int curr_a = 0; commands[curr_c]->c_alias[curr_a]; curr_a++)
 		 	{
-				if (!strcmp(commands[curr_c]->c_alias[curr_a], c_name)) return (struct command_d *) commands[curr_c]; 
+				if (!strcmp(commands[curr_c]->c_alias[curr_a], c_name)) return (struct tool_builder_command *) commands[curr_c]; 
 			}
 		}
 	}
@@ -305,39 +291,37 @@ static inline struct command_d *find_command(const struct command_d **commands, 
 }
 
 
-int execute_command(int argc, char *argv[], const struct builder_d *c_builder)
+int tool_builder_execute(int argc, char *argv[], const struct tool_builder *c_builder)
 {
 	if (c_builder == NULL || c_builder->b_commands == NULL ||
 	    c_builder->b_help == NULL)
 	{
-		return BUILDER_IS_NOT_INITIALIZED;
+		return TOOL_BUILDER_IS_NOT_INITIALIZED;
 	}
 
-	if (argv[1] == NULL) return EMPTY_NAME;
+	if (argv[1] == NULL) return TOOL_BUILDER_EMPTY_NAME;
 
 
 	// Get the requested command to execute.
-	struct command_d *command = find_command((const struct command_d **) c_builder->b_commands, argv[1],
-						 c_builder->b_commandsc);
+	struct tool_builder_command *command = find_command((const struct tool_builder_command **) c_builder->b_commands, argv[1],
+						 	    c_builder->b_commandsc);
 	
-	if (command == NULL) return WRONG_NAME_OR_ALIAS;
+	if (command == NULL) return TOOL_BUILDER_WRONG_NAME_OR_ALIAS;
 
-	if (((argc - 2) - command->c_argc) < 0) return WRONG_ARG_NUM;
+	if (((argc - 2) - command->c_argc) < 0) return TOOL_BUILDER_WRONG_ARG_NUM;
 
-	if (command->c_call_back == NULL) return NO_ACTION_DEFINED;
+	if (command->c_callback == NULL) return TOOL_BUILDER_NO_ACTION_DEFINED;
 
 	// Build the info to recieve the call back.
-	struct exec_info exec_inf;
+	struct tool_builder_args exec_inf;
 	exec_inf.c_name = command->c_name;
 	exec_inf.c_used_alias = argv[1];
 	exec_inf.c_values = (argv + 2);	// This points to the first argument of the requested command. 
 	exec_inf.c_argc = command->c_argc;
-	exec_inf.c_builder = (struct builder_d *) c_builder;
+	exec_inf.c_builder = (struct tool_builder *) c_builder;
 
 	// Call the callback with the values.
-	command->c_call_back(&exec_inf);
+	command->c_callback(&exec_inf);
 
 	return 0;
 }
-
-

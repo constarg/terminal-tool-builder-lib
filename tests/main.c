@@ -1,7 +1,7 @@
 #include <tool_builder.h>
 
 
-void testing_command_action(const struct exec_info *info)
+void testing_command_action(const struct tool_builder_args *info)
 {
 	printf("Command_name: %s\n", info->c_name);
 	printf("Used alias: %s\n", info->c_used_alias);
@@ -15,7 +15,8 @@ void testing_command_action(const struct exec_info *info)
 
 }
 
-void testing_2_command_action(const struct exec_info *info)
+
+void testing_2_command_action(const struct tool_builder_args *info)
 {
 	printf("Command_name: %s\n", info->c_name);
 	printf("Used alias: %s\n", info->c_used_alias);
@@ -31,40 +32,39 @@ void testing_2_command_action(const struct exec_info *info)
 
 int main(int argc, char *argv[]) {
 	// tests.
-	struct builder_d *builder;	
-	initialize_builder(&builder);
+	struct tool_builder builder;	
+	tool_builder_init(&builder);
 
 
-	initialize_help(builder, "Testing-tool");
+	tool_builder_init_help(&builder, "Testing-tool");
 
 	// Add description to the docs of help.
-	add_help_tool_description(builder, "This is a test of a description");	
-  	add_help_tool_closing_description(builder, "hello");	
+	tool_builder_set_desc(&builder, "This is a test of a description");	
+  	tool_builder_set_closing_desc(&builder, "hello");	
 	
 	// Add a new command to the docs of help.
-	add_help_tool_command(builder, "Testing", "This command is a test command");
+	tool_builder_set_command_desc(&builder, "Testing", "This command is a test command");
 
-	add_command(
-		builder,
+	tool_builder_add_command(
+		&builder,
 		"Testing",
 		2,
 		&testing_command_action	
 	);
 
-	add_command(
-		builder,
+	tool_builder_add_command(
+		&builder,
 		"Something",
 		3,
 		&testing_2_command_action
 	);
 
 
-	add_command_alias(builder, "Testing", "Test", "t", "te", NULL); 
-	add_help_tool_alias(builder, "Testing");
-	
+	tool_builder_add_alias(&builder, "Testing", "Test", "t", "te", NULL); 
+	tool_builder_add_tool_alias(&builder, "Testing");
 
-	int error = execute_command(argc, argv, builder);
+	int error = tool_builder_execute(argc, argv, &builder);
 	printf("Error = %d\n", error);
 
-	destroy_builder(&builder);	
+	tool_builder_destroy(&builder);	
 }
