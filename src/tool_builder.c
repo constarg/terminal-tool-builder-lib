@@ -39,6 +39,13 @@ struct command_d
 };
 
 
+struct builder_d 
+{
+	struct command_d **b_commands;				// array of commands.
+	int b_commandsc;					// The number of the commands.
+	struct help_d *b_help;					// The help of the tool.
+};
+
 static inline struct command_d *find_command(const struct command_d **commands, const char *c_name,
 					     int commandsc);
 
@@ -49,9 +56,9 @@ static void help_defualt_action(const struct exec_info *info)
 	if (builder == NULL || builder->b_help == NULL) return;
 	printf("%s\n", builder->b_help->h_usage_sec);
 	
-	if (builder->b_help->h_description == NULL) return;
+	if (builder->b_help->h_description == NULL) goto skip_dec;
 	printf("%s\n\n\n", builder->b_help->h_description);
-	
+skip_dec:	
 	struct command_help **commands_h = builder->b_help->h_commands;
 	for (int h = 0; h < builder->b_help->h_commandsc; h++)
 	{
@@ -139,7 +146,7 @@ int add_help_tool_description(struct builder_d *c_builder, const char *c_descrip
 {
 	if (c_builder == NULL || c_builder->b_help == NULL) return BUILDER_IS_NOT_INITIALIZED;
 
-	struct help_d *(*help_tmp) = &c_builder->b_help; 
+	struct help_d *(*help_tmp) = &c_builder->b_help;
 	(*help_tmp)->h_description = (char *) malloc(sizeof(char) * strlen(c_description) + 1);
 	strcpy((*help_tmp)->h_description, c_description);
 	
@@ -194,13 +201,13 @@ int add_help_tool_alias(struct builder_d *c_builder, const char *c_name)
 int add_help_tool_closing_description(struct builder_d *c_builder, const char *close_description)
 {
 	if (c_builder == NULL || c_builder->b_help == NULL) return BUILDER_IS_NOT_INITIALIZED;
-	
-	char *(*closing_desc) = &c_builder->b_help->h_close_description;
-	*closing_desc = (char *) malloc(sizeof(char) * strlen(close_description) + 1);
-	if ((*closing_desc) == NULL) return FAILED_TO_ADD;
 
-	// Copy the contents.
-	strcpy((*closing_desc), close_description);
+	struct help_d *(*help_tmp) = &c_builder->b_help;
+
+	(*help_tmp)->h_close_description = (char *) malloc(sizeof(char) * (strlen(close_description) + 1));
+	if ((*help_tmp)->h_close_description == NULL) return FAILED_TO_ADD;
+	strcpy((*help_tmp)->h_close_description, close_description);
+	
 	return 0;
 }
 
