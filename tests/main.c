@@ -59,7 +59,6 @@ int main(int argc, char *argv[]) {
 		&testing_2_command_action
 	);
 
-
 	tool_builder_add_alias(&builder, "Testing", "Test", "t", "te", NULL); 
 	tool_builder_add_tool_alias(&builder, "Testing");
 

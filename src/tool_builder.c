@@ -56,8 +56,10 @@ skip_dec:
 	for (int h = 0; h < builder->b_help->h_commandsc; h++)
 	{
 		printf("\t%s", commands_h[h]->c_name);
+		if (commands_h[h]->c_alias == NULL) goto skip_alias;
 		for (int c_a = 0; commands_h[h]->c_alias[c_a]; c_a++)
 			printf(" ,%s,", commands_h[h]->c_alias[c_a]);
+skip_alias:
 		printf("\t\t%s\n\n", commands_h[h]->c_description);
 	}
 
