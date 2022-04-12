@@ -87,8 +87,8 @@ The `add_help_tool_alias` the first parameter of this function is the builder an
 To set a new command for the tool you are creating, all you have to do is call the following function. 
 ```C
 tool_builder_add_command(&builder, "command_name", arg, action);
-            			  ^           ^            ^      ^
-        				The builder  Command       args   action
+            		   ^           ^            ^      ^
+        		The builder  Command       args   action
 ```
 The `add_command` function takes 4 arguments. The first is the builder, the second is the name of your command, the third is the argumets that your command require in order to run and the forth is the action, callback, to call when this command is called from the terminal. The action is a ballback that is has the below signature.
 ```C
