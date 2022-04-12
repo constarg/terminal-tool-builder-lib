@@ -55,7 +55,7 @@ To enable this feature, initiaize the help command as below.
 ```C
 tool_builder_init_help(&builder, "tool-name");
 ```
-The `intialize_help` function takes as the first parameter the builder and as a second parameter the name of your tool.
+The `tool_builder_init_help` function takes as the first parameter the builder and as a second parameter the name of your tool.
 
 ## Build the help docs
 Putting your own command in the docs of the help command helps the user who will use your tool to understand it.<br>
@@ -63,22 +63,22 @@ The below function will allow you to add a description in your help docs.
 ```C
 tool_builder_set_desc(&builder, "Your description");	
 ```
-The `add_help_tool_description` function require as the first parameter the builder and as a second parameter the description of your docs.<br>
+The `tool_builder_set_desc` function require as the first parameter the builder and as a second parameter the description of your docs.<br>
 The below function will allow you to add a closure description, if you like to, in your help docs.
 ```C
 tool_builder_set_closing_desc(&builder, "Your closure description");	
 ```
-The `add_help_tool_closing_description` function require as the first parameter the builder and as a second parametr the closure description you like.<br>
+The `tool_builder_set_closing_desc` function require as the first parameter the builder and as a second parametr the closure description you like.<br>
 The below function will allow you to add a command, you support in your tool, in the help docs.
 ```C
 tool_builder_set_command_desc(&builder, "your_command_name", "The description of your command");
 ```
-The `add_help_tool_command` takes 3 parameters. The first is the builder, the second is the name of your command and the third is the description of your  command.<br>
+The `tool_builder_set_command_desc` takes 3 parameters. The first is the builder, the second is the name of your command and the third is the description of your  command.<br>
 The below function will allow you to add alias to an existing command in the docs.
 ```C
 tool_builder_add_tool_alias(&builder, "your_command_name");
 ```
-The `add_help_tool_alias` the first parameter of this function is the builder and the second parameter is the name of the command to add the aliases.<br>
+The `tool_builder_add_tool_alias` the first parameter of this function is the builder and the second parameter is the name of the command to add the aliases.<br>
 **Caution! the aliases are the same as the ones you set when creating the command, will be explained below, so you do not need to re-enter them. That is why they are not requested.**<br><br>
 
 **Caution!! if you want to make your own version of the help command the above will not work. The docs will have to be made differently.**
@@ -90,9 +90,9 @@ tool_builder_add_command(&builder, "command_name", arg, action);
             		   ^           ^            ^      ^
         		The builder  Command       args   action
 ```
-The `add_command` function takes 4 arguments. The first is the builder, the second is the name of your command, the third is the argumets that your command require in order to run and the forth is the action, callback, to call when this command is called from the terminal. The action is a ballback that is has the below signature.
+The `tool_builder_add_command` function takes 4 arguments. The first is the builder, the second is the name of your command, the third is the argumets that your command require in order to run and the forth is the action, callback, to call when this command is called from the terminal. The action is a ballback that is has the below signature.
 ```C
-void (*c_call_back)(const struct exec_info *info)
+void (*c_callback)(const struct tool_builder_args *info)
 ```
 When your command is called from the terminal, the library will return to you the below infos, in the variable info.
 ```C
@@ -111,7 +111,7 @@ In order to add alias to a command you have to call the below function.
 ```C
 tool_builder_add_alias(&builder, "command_name", "alias_1", "alias_2", "alias_3", NULL);
 ```
-The `add_command_alias` takes as first parameter the builder, as the second parameter the the command you want to add the aliases and as the third parameter can take an unlimited number of aliases.
+The `tool_builder_add_alias` takes as first parameter the builder, as the second parameter the the command you want to add the aliases and as the third parameter can take an unlimited number of aliases.
 **Cation!!! the last alias must be NULL!**
 
 ## Command Action
@@ -120,7 +120,7 @@ If you want to enter or change the action of a command later you can do so using
 ```C
 tool_builder_set_action(&builder, "command_name", action);
 ```
-The `add_action` function takes three parameters. The first parameter is the builder, the second is the command you want to add the action and the third is the action you want to add.
+The `tool_builder_set_action` function takes three parameters. The first parameter is the builder, the second is the command you want to add the action and the third is the action you want to add.
 
 ## Shortcuts
 Some of the above functions can be done a bit faster by using only one function, instead of two. 
@@ -128,13 +128,13 @@ Some of the above functions can be done a bit faster by using only one function,
 ```C
 tool_builder_add_both(&builder, "command_name", args, action, "description")
 ```
-The `add_command_both` function has 5 parameters. The first is the builder, the second is the name of the command to add, the third is the action to take when the command is called and the fifth is the description to add in the docs, for this specific command.
+The `tool_builder_add_both` function has 5 parameters. The first is the builder, the second is the name of the command to add, the third is the action to take when the command is called and the fifth is the description to add in the docs, for this specific command.
 
 Α similar shortcut applies to alias.
 ```C
 tool_builder_add_alias_both(&builder, "command_name", "alias_1", "alias_2", "alias_3", NULL)
 ```
-The `add_command_alias_both` function takes 2 parameters and an unlimited number of aliases. The first parameter is the builder, the second is the name of the command you want to add the aliases and the rest is the aliases. The defferent with this function is that it will also add the aliases in the docs.<br>
+The `tool_builder_add_alias_both` function takes 2 parameters and an unlimited number of aliases. The first parameter is the builder, the second is the name of the command you want to add the aliases and the rest is the aliases. The defferent with this function is that it will also add the aliases in the docs.<br>
 **Cation!!! the last alias must be NULL!**
 
 ## Execution
@@ -142,7 +142,7 @@ To execute the command that the user has typed you have to call the below functi
 ```C
 tool_builder_execute(argc, argv, &builder);
 ```
-The `execute_command` function has 3 parameters. The first parameter is the argc of main, the second is the argv of main and the third is the builder.
+The `tool_builder_execute` function has 3 parameters. The first parameter is the argc of main, the second is the argv of main and the third is the builder.
 This function is responsible for the determination of what command has been given from the terminal and also is the function that calls the callback of the command thet has been requested.
 
 ## Destroying
@@ -150,7 +150,7 @@ Once you have completed all the procedures you have to do with the builder you s
 ```C
 tool_builder_destroy(&builder);
 ```
-The `destroy_builder` function free's the memory that has been allocated for the builder. It has only one parameter and is the builder. 
+The `tool_builder_destroy` function free's the memory that has been allocated for the builder. It has only one parameter and is the builder. 
 
 ## Example
 An example of the library in use can be found in the **tests** folder
