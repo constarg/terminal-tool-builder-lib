@@ -39,7 +39,7 @@ int main(int argc, char *argv[]) {
 
 	// Add description to the docs of help.
 	add_help_tool_description(builder, "This is a test of a description");	
-	
+  	add_help_tool_closing_description(builder, "hello");	
 	
 	// Add a new command to the docs of help.
 	add_help_tool_command(builder, "Testing", "This command is a test command");

@@ -26,12 +26,7 @@ struct command_help;
 struct help_d; 
 struct command_d; 
 
-struct builder_d 
-{
-	struct command_d **b_commands;				// array of commands.
-	int b_commandsc;					// The number of the commands.
-	struct help_d *b_help;					// The help of the tool.
-};
+struct builder_d;
 
 struct exec_info 
 {
