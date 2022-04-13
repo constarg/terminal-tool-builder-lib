@@ -43,7 +43,7 @@ int main(int argc, char *argv[]) {
   	tool_builder_set_closing_desc(&builder, "hello");	
 	
 	// Add a new command to the docs of help.
-	tool_builder_set_command_desc(&builder, "Testing", "This command is a test command");
+    tool_builder_add_command_doc(&builder, "Testing", "This command is a test command");
 
 	tool_builder_add_command(
 		&builder,
@@ -59,8 +59,8 @@ int main(int argc, char *argv[]) {
 		&testing_2_command_action
 	);
 
-	tool_builder_add_alias(&builder, "Testing", "Test", "t", "te", NULL); 
-	tool_builder_add_tool_alias(&builder, "Testing");
+	tool_builder_add_alias(&builder, "Testing", "Test", "t", "te", NULL);
+    tool_builder_add_alias_doc(&builder, "Testing");
 
 	int error = tool_builder_execute(argc, argv, &builder);
 	printf("Error = %d\n", error);

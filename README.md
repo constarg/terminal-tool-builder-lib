@@ -71,14 +71,14 @@ tool_builder_set_closing_desc(&builder, "Your closure description");
 The `tool_builder_set_closing_desc` function require as the first parameter the builder and as a second parametr the closure description you like.<br>
 The below function will allow you to add a command, you support in your tool, in the help docs.
 ```C
-tool_builder_set_command_desc(&builder, "your_command_name", "The description of your command");
+tool_builder_add_command_doc(&builder, "your_command_name", "The description of your command");
 ```
-The `tool_builder_set_command_desc` takes 3 parameters. The first is the builder, the second is the name of your command and the third is the description of your  command.<br>
+The `tool_builder_add_command_doc` takes 3 parameters. The first is the builder, the second is the name of your command and the third is the description of your  command.<br>
 The below function will allow you to add alias to an existing command in the docs.
 ```C
-tool_builder_add_tool_alias(&builder, "your_command_name");
+tool_builder_add_alias_doc(&builder, "your_command_name");
 ```
-The `tool_builder_add_tool_alias` the first parameter of this function is the builder and the second parameter is the name of the command to add the aliases.<br>
+The `tool_builder_add_alias_doc` the first parameter of this function is the builder and the second parameter is the name of the command to add the aliases.<br>
 **Caution! the aliases are the same as the ones you set when creating the command, will be explained below, so you do not need to re-enter them. That is why they are not requested.**<br><br>
 
 **Caution!! if you want to make your own version of the help command the above will not work. The docs will have to be made differently.**
