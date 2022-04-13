@@ -40,7 +40,7 @@ struct tool_builder_command
 
 
 static inline struct tool_builder_command *find_command(const struct tool_builder_command **commands, const char *c_name,
-					     int commandsc);
+					     		int commandsc);
 
 static void help_defualt_action(const struct tool_builder_args *info)
 {
@@ -51,12 +51,13 @@ static void help_defualt_action(const struct tool_builder_args *info)
 	
 	if (builder->b_help->h_description == NULL) goto skip_dec;
 	printf("%s\n\n\n", builder->b_help->h_description);
-skip_dec:	
-	struct tool_builder_c_help **commands_h = builder->b_help->h_commands;
+    struct tool_builder_c_help **commands_h;
+skip_dec:
+    commands_h = builder->b_help->h_commands;
 	for (int h = 0; h < builder->b_help->h_commandsc; h++)
 	{
 		printf("\t%s", commands_h[h]->c_name);
-		if (commands_h[h]->c_alias == NULL) goto skip_alias;
+        if (commands_h[h]->c_alias == NULL) goto skip_alias;
 		for (int c_a = 0; commands_h[h]->c_alias[c_a]; c_a++)
 			printf(" ,%s,", commands_h[h]->c_alias[c_a]);
 skip_alias:
@@ -148,7 +149,8 @@ int tool_builder_set_command_desc(struct tool_builder *c_builder, const char *c_
 {
 	if (c_builder == NULL || c_builder->b_help == NULL) return TOOL_BUILDER_IS_NOT_INITIALIZED;
 
-	struct tool_builder_c_help *new_command_h = (struct tool_builder_c_help *) malloc(sizeof(struct tool_builder_c_help)); 
+	struct tool_builder_c_help *new_command_h = (struct tool_builder_c_help *) malloc(sizeof(struct tool_builder_c_help));
+    memset(new_command_h, 0x0, sizeof(struct tool_builder_c_help));
 	new_command_h->c_name = (char *) malloc(sizeof(char) * (strlen(c_name) + 1));
 	new_command_h->c_description = (char *) malloc(sizeof(char) * (strlen(c_description) + 1));
 	if (new_command_h->c_name == NULL || new_command_h->c_description == NULL)
@@ -316,10 +318,11 @@ int tool_builder_execute(int argc, char *argv[], const struct tool_builder *c_bu
 
 	// Build the info to recieve the call back.
 	struct tool_builder_args exec_inf;
+	memset(&exec_inf, 0x0, sizeof(struct tool_builder_args));
 	exec_inf.c_name = command->c_name;
 	exec_inf.c_used_alias = argv[1];
-	exec_inf.c_values = (argv + 2);	// This points to the first argument of the requested command. 
 	exec_inf.c_argc = command->c_argc;
+	exec_inf.c_values = (command->c_argc > 0)? (argv + 2): NULL;	// This points to the first argument of the requested command.
 	exec_inf.c_builder = (struct tool_builder *) c_builder;
 
 	// Call the callback with the values.
