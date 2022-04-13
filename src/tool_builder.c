@@ -268,6 +268,23 @@ static inline struct tool_builder_command *find_command(const struct tool_builde
 	return NULL;
 }
 
+int tool_builder_call_command(const char *c_name, const struct tool_builder *c_builder)
+{
+    struct tool_builder_command *command = find_command((const struct tool_builder_command *) c_builder->t_commands,
+                                                        c_name, c_builder->t_commandsc);
+    if (command == NULL) return TOOL_BUILDER_WRONG_NAME_OR_ALIAS;
+
+    struct tool_builder_args exec_inf;
+    memset(&exec_inf, 0x0, sizeof(struct tool_builder_args));
+    exec_inf.c_name = command->c_name;
+    exec_inf.c_used_alias = command->c_name;
+    exec_inf.c_argc = command->c_argc;
+    exec_inf.c_values = NULL;	// This points to the first argument of the requested command.
+    exec_inf.c_builder = (struct tool_builder *) c_builder;
+    // call the command.
+    command->c_callback(&exec_inf);
+    return 0;
+}
 
 int tool_builder_execute(int argc, char *argv[], const struct tool_builder *c_builder)
 {
