@@ -30,7 +30,7 @@ struct tool_builder_command
 
 
 static inline struct tool_builder_command *find_command(const struct tool_builder_command *commands, const char *c_name,
-					     		                        int commandsc);
+                                                        int commandsc);
 
 static void help_defualt_action(const struct tool_builder_args *info)
 {
@@ -60,18 +60,18 @@ skip_alias:
 
 void tool_builder_init(struct tool_builder *c_builder)
 {
-    memset(c_builder, 0x0, sizeof(struct tool_builder));
+        memset(c_builder, 0x0, sizeof(struct tool_builder));
 	c_builder->t_commands = (struct tool_builder_command *) calloc(1, sizeof(struct tool_builder_command));
 	c_builder->t_commandsc = 0;
 }
 
 void tool_builder_destroy(struct tool_builder *c_builder)
 {
-    for (int h = 0; h < c_builder->t_help.t_commandsc; h++)
-    {
-        free(c_builder->t_help.t_commands[h].c_name);
-        free(c_builder->t_help.t_commands[h].c_description);
-    }
+        for (int h = 0; h < c_builder->t_help.t_commandsc; h++)
+        {
+            free(c_builder->t_help.t_commands[h].c_name);
+            free(c_builder->t_help.t_commands[h].c_description);
+        }
 	// Free help.
 	free(c_builder->t_help.t_commands);
 	free(c_builder->t_help.t_usage_sec);
@@ -96,7 +96,7 @@ int tool_builder_init_help(struct tool_builder *c_builder, const char *tool_name
 	const char *str_u_2 = "[OPTION]...";
 	
 	size_t usage_size = strlen(tool_name) + strlen(str_u_1)
-				                + strlen(str_u_2) + 3;
+                                    + strlen(str_u_2) + 3;
  
 	char *(*usage_sec) = &c_builder->t_help.t_usage_sec;
 	*usage_sec = malloc(sizeof(char) * usage_size);
@@ -131,7 +131,7 @@ int tool_builder_add_command_doc(struct tool_builder *c_builder, const char *c_n
                                  const char *c_description)
 {
 	struct tool_builder_c_help new_command_h;
-    memset(&new_command_h, 0x0, sizeof(struct tool_builder_c_help));
+        memset(&new_command_h, 0x0, sizeof(struct tool_builder_c_help));
 	new_command_h.c_name = (char *) malloc(sizeof(char) * (strlen(c_name) + 1));
 	new_command_h.c_description = (char *) malloc(sizeof(char) * (strlen(c_description) + 1));
 	if (new_command_h.c_name == NULL || new_command_h.c_description == NULL)
@@ -157,7 +157,7 @@ int tool_builder_add_command_doc(struct tool_builder *c_builder, const char *c_n
 int tool_builder_add_alias_doc(struct tool_builder *c_builder, const char *c_name)
 {
 	struct tool_builder_command *c_found = find_command((const struct tool_builder_command *) c_builder->t_commands,
-                                                        c_name, c_builder->t_commandsc);
+                                                            c_name, c_builder->t_commandsc);
 	if (c_found == NULL) return TOOL_BUILDER_NO_SUCH_COMMAND_EXISTS;
 
 	for (int h = 0; h < c_builder->t_help.t_commandsc; h++)
@@ -179,12 +179,12 @@ int tool_builder_set_closing_desc(struct tool_builder *c_builder, const char *cl
 }
 
 int tool_builder_add_command(struct tool_builder *c_builder, const char *c_name, int c_argc,  
-		                     void (*c_callback)(const struct tool_builder_args *info))
+                             void (*c_callback)(const struct tool_builder_args *info))
 {
 	// Allocate memory for the new command.
 	int last_c = c_builder->t_commandsc;
 	struct tool_builder_command new_command;
-    memset(&new_command, 0x0, sizeof(struct tool_builder_command));
+        memset(&new_command, 0x0, sizeof(struct tool_builder_command));
 	new_command.c_name = (char *) malloc(sizeof(char) * (strlen(c_name) + 1));
 
 	strcpy(new_command.c_name, c_name);
@@ -192,17 +192,17 @@ int tool_builder_add_command(struct tool_builder *c_builder, const char *c_name,
 	
 	new_command.c_callback = c_callback;
 	c_builder->t_commands = (struct tool_builder_command *) realloc(c_builder->t_commands,
-							     		 sizeof(struct tool_builder_command) * (last_c + 1));
+                                                                   sizeof(struct tool_builder_command) * (last_c + 1));
 	c_builder->t_commands[last_c] = new_command;
 	c_builder->t_commandsc += 1;
 	return 0;
 }
 
 int tool_builder_add_alias(struct tool_builder *c_builder, const char *c_name, 
-		                   const char *c_alias, ...)
+                           const char *c_alias, ...)
 {
 	struct tool_builder_command *command = find_command((const struct tool_builder_command *) c_builder->t_commands,
-							                            c_name, c_builder->t_commandsc);
+                                                            c_name, c_builder->t_commandsc);
 
 	if (command == NULL) return TOOL_BUILDER_NO_SUCH_COMMAND_EXISTS;
 	if (c_alias == NULL) return -1;
@@ -223,8 +223,7 @@ int tool_builder_add_alias(struct tool_builder *c_builder, const char *c_name,
 		// copy the alias.
 		strcpy(command->c_alias[command->c_alias_c], tmp_a);
 		// increase the aliases.
-		command->c_alias = (char **) realloc(command->c_alias, 
-						               (++command->c_alias_c + 1) * sizeof(char *));
+		command->c_alias = (char **) realloc(command->c_alias,(++command->c_alias_c + 1) * sizeof(char *));
 		tmp_a = va_arg(alias_list, char*);
 	}
 
@@ -237,7 +236,7 @@ int tool_builder_add_alias(struct tool_builder *c_builder, const char *c_name,
 
 
 int tool_builder_set_action(struct tool_builder *c_builder, const char *c_name,
-	                        void (*c_callback)(const struct tool_builder_args *info))
+                            void (*c_callback)(const struct tool_builder_args *info))
 {
 	struct tool_builder_command *ch_command = find_command((const struct tool_builder_command *) c_builder->t_commands, c_name,
                                                c_builder->t_commandsc);
@@ -248,7 +247,7 @@ int tool_builder_set_action(struct tool_builder *c_builder, const char *c_name,
 
 
 static inline struct tool_builder_command *find_command(const struct tool_builder_command *commands, const char *c_name,
-					                                    int commandsc)
+                                                        int commandsc)
 {
 
 	for (int curr_c = 0; curr_c < commandsc; curr_c++)
@@ -262,7 +261,7 @@ static inline struct tool_builder_command *find_command(const struct tool_builde
 			for (int curr_a = 0; commands[curr_c].c_alias[curr_a]; curr_a++)
 		 	{
 				if (!strcmp(commands[curr_c].c_alias[curr_a], c_name)) return (struct tool_builder_command *)
-                                                                              &commands[curr_c];
+                                                                                                &commands[curr_c];
 			}
 		}
 	}
@@ -277,7 +276,7 @@ int tool_builder_execute(int argc, char *argv[], const struct tool_builder *c_bu
 
 	// Get the requested command to execute.
 	struct tool_builder_command *command = find_command((const struct tool_builder_command *) c_builder->t_commands, argv[1],
-                                            c_builder->t_commandsc);
+                                                            c_builder->t_commandsc);
 	
 	if (command == NULL) return TOOL_BUILDER_WRONG_NAME_OR_ALIAS;
 
