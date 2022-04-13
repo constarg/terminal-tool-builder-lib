@@ -190,7 +190,16 @@ extern int tool_builder_set_action(struct tool_builder *c_builder, const char *c
 */
 int tool_builder_execute(int argc, char *argv[], const struct tool_builder *c_builder);
 
-
+/**
+ *     Execute a command with no values!. With this function you can
+ *     call any command that has no arguments.
+ *     @param c_name The command to execute it can be an alias as well.
+ *     @param c_builder The builder.
+ *     @return On success 0 is returned. On error on integer error is returned.
+ *     Errors can be:
+ *          Wrong command name or alias: -2
+ */
+int tool_builder_call_command(const char *c_name, const struct tool_builder *c_builder);
 
 static int inline tool_builder_add_both(struct tool_builder *c_builder, const char *c_name,
                                         int c_argc, void (*c_callback)(const struct tool_builder_args *info),
