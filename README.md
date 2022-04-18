@@ -50,7 +50,7 @@ tool_builder_init(&builder);
 Done! now your builder is ready to build your tool!.
 
 ## Initialize help
-The help command is the classic command that all terminal-based tools have. The library has the feature to be creat automatically this commmand based on the tool's commands. Or the user can ignore it and make his own help command.
+The help command is the classic command that all terminal-based tools have. The library has the feature to create automatically this commmand based on the tool's commands. Or the user can ignore it and make his own help command.
 To enable this feature, initiaize the help command as below.
 ```C
 tool_builder_init_help(&builder, "tool-name");
