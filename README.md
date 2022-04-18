@@ -39,7 +39,7 @@ After this the program will be installed and ready to run.
 Below will be analyzed how the library can be used.<br><br>
 
 ## Initializing the builder
-An empty c_builder pointer must be defined to start building the terminal tool.
+A variable with type tool_builder can be defined like below
 ```C
 struct tool_builder builder;
 ``` 
