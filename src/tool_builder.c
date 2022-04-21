@@ -62,7 +62,8 @@ void tool_builder_init(struct tool_builder *c_builder)
 {
         memset(c_builder, 0x0, sizeof(struct tool_builder));
 	c_builder->t_commands = (struct tool_builder_command *) calloc(1, sizeof(struct tool_builder_command));
-	c_builder->t_commandsc = 0;
+	c_builder->t_commandsc = 0x0;
+	c_builder->t_mc = 0x1;
 }
 
 void tool_builder_destroy(struct tool_builder *c_builder)
