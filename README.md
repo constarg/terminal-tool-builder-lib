@@ -144,7 +144,7 @@ For example the below senario requests to execute two commands.
 ./your-tool-name --command1 arg1 arg2 --command2 arg1 arg2
 ```
 If you want to disable this feature and allow only one command to be executed you can disable it with the below function.
-```
+```C
 tool_builder_set_mc(c_builder, state);
 ```
 Where c_builder is the builder and the state can be '1' or '0' depents if you want the feature enabled or not.
