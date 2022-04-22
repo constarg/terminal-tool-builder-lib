@@ -64,8 +64,10 @@ int main(int argc, char *argv[]) {
 
         //tool_builder_call_command("--help", &builder);
 
+	//tool_builder_set_mc(&builder, 0);
+
 	int error = tool_builder_prepare(argc, argv, &builder);
-	//tool_builder_execute();
+	tool_builder_execute();
 
 	printf("Error = %d\n", error);
 

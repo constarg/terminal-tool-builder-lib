@@ -301,11 +301,12 @@ int tool_builder_prepare(int argc, char *argv[], const struct tool_builder *c_bu
 	struct tool_builder_command *c_curr;
 	struct tb_queue_node_d c_data;
 	
+	memset(&c_data, 0x0, sizeof(struct tb_queue_node_d));
+
 	char *(*command) = (++argv); // point to the first command.
 
 	while (*command)
 	{
-		printf("%s\n", *command);
 		c_curr = find_command((const struct tool_builder_command *) c_builder->t_commands, *command,
                                       c_builder->t_commandsc);
 		if (c_curr == NULL) return TOOL_BUILDER_NO_SUCH_COMMAND_EXISTS;
@@ -314,16 +315,17 @@ int tool_builder_prepare(int argc, char *argv[], const struct tool_builder *c_bu
 		c_data.c_args.c_name = c_curr->c_name;
 		c_data.c_args.c_used_alias = *command;
 		c_data.c_args.c_argc = c_curr->c_argc;
-		c_data.c_args.c_values = malloc(sizeof(char *) * (c_curr->c_argc + 1));
+		c_data.c_args.c_values = (char **) malloc(sizeof(char *) * (c_curr->c_argc + 1));
 		c_data.c_args.c_builder = (struct tool_builder *) c_builder;
 		c_data.c_callback = c_curr->c_callback;
+
 		// store the values.
 		for (int v = 0; v < c_curr->c_argc; v++)
 		{
-			c_data.c_args.c_values[v] = ( *(command + 1) == NULL )? NULL : *(command + 1);
+			c_data.c_args.c_values[v] = ( *(command + v + 1) == NULL )? NULL : *(command + v + 1);
 			if (	c_data.c_args.c_values[v] == NULL  
 				||
-			   	find_command((const struct tool_builder_command *) c_builder->t_commands, *command,
+			   	find_command((const struct tool_builder_command *) c_builder->t_commands, *(command + v + 1),
                                       	     c_builder->t_commandsc) != NULL
 			   )
 			{
@@ -332,8 +334,11 @@ int tool_builder_prepare(int argc, char *argv[], const struct tool_builder *c_bu
 				return TOOL_BUILDER_WRONG_ARG_NUM;
 			}
 		}
+		c_data.c_args.c_values[c_curr->c_argc] = NULL;
 		tb_queue_enqueue(&c_data, &c_queue);
-		command += c_data.c_args.c_argc;
+		command += c_data.c_args.c_argc + 1;
+
+		if (!c_builder->t_mc) break;
 	}
 
 	return 0;
@@ -343,6 +348,7 @@ void tool_builder_execute()
 {
 	// execute each command in the queue.
 	struct tb_queue_node_d c_to_exec;
+	memset(&c_to_exec, 0x0, sizeof(struct tb_queue_node_d));
 
 	while (!tb_queue_is_empty(&c_queue))
 	{
@@ -350,6 +356,4 @@ void tool_builder_execute()
 		c_to_exec.c_callback(&c_to_exec.c_args);
 		free(c_to_exec.c_args.c_values);
 	}
-
-	tb_queue_destroy(&c_queue);
 }
