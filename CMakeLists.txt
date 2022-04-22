@@ -3,15 +3,16 @@ project(terminal-tool-builder C)
 
 set(CMAKE_C_STANDARD 17)
 
+set(HEADER_FILES include/tool_builder.h src/ds/queue.h)
+set(SOURCE_FILES src/tool_builder.c src/ds/queue.c)
+set(TO_INCLUDE include/ src/ds)
 
 
 ADD_LIBRARY(	
 		toolbuilder STATIC
-		src/tool_builder.c
-		include/tool_builder.h
+		${HEADER_FILES}
+		${SOURCE_FILES}
 	   )
 
-include_directories(
-        	include/
-)
+include_directories(${TO_INCLUDE})
 
