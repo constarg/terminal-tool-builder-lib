@@ -33,6 +33,21 @@ static inline void tb_queue_init(struct tb_queue *queue)
 	memset(queue, 0x0, sizeof(struct tb_queue));
 }
 
+static inline void tb_queue_destroy(struct tb_queue *queue)
+{
+	struct tb_queue_node *tmp = queue->front->next;
+	while(tmp)
+	{
+		free(queue->front);
+		queue->front = tmp;
+		tmp = queue->front->next;
+	}
+}
+
+static inline int tb_queue_is_empty(struct tb_queue *queue)
+{
+	return (queue->front == NULL)? 0x1 : 0x0;
+}
 
 /**
  *	Put's an element in queue.
