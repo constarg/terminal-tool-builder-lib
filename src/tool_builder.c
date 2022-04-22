@@ -328,7 +328,7 @@ void tool_builder_execute()
 	// execute each command in the queue.
 	struct tb_queue_node_d c_to_exec;
 
-	while (tb_queue_is_empty(&c_queue))
+	while (!tb_queue_is_empty(&c_queue))
 	{
 		tb_queue_dequeue(&c_to_exec, &c_queue);
 		c_to_exec.c_callback(&c_to_exec.c_args);
