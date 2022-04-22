@@ -36,16 +36,18 @@ static inline void tb_queue_init(struct tb_queue *queue)
 
 /**
  *	Put's an element in queue.
+ *	@param src The data to put.
  *	@param queue The queue to put the element.
 */
-extern void tb_queue_enqueue(struct tb_queue *queue, struct tb_queue);
+extern void tb_queue_enqueue(struct tb_queue_node_d *src, struct tb_queue *queue);
 
 
 /**
  *	Removes an element from queue.
+ *	@param dst The destination where the last element of queue must be stored.
  *	@param queue The queue to remove the element.
 */
-extern void tb_queue_dequeue(struct tb_queue *queue);
+extern void tb_queue_dequeue(struct tb_queue_node_d *dst, struct tb_queue *queue);
 
 
 #endif
