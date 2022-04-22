@@ -137,13 +137,32 @@ tool_builder_add_alias_both(&builder, "command_name", "alias_1", "alias_2", "ali
 The `tool_builder_add_alias_both` function takes 2 parameters and an unlimited number of aliases. The first parameter is the builder, the second is the name of the command you want to add the aliases and the rest is the aliases. The defferent with this function is that it will also add the aliases in the docs.<br>
 **Cation!!! the last alias must be NULL!**
 
-## Execution
-To execute the command that the user has typed you have to call the below function in the main.
-```C
-tool_builder_execute(argc, argv, &builder);
+## Multiple commands in one line
+The tool by default can execute multiple commands that has been requested, even if it is in one line in terminal.
+For example the below senario requests to execute two commands.
 ```
-The `tool_builder_execute` function has 3 parameters. The first parameter is the argc of main, the second is the argv of main and the third is the builder.
-This function is responsible for the determination of what command has been given from the terminal and also is the function that calls the callback of the command thet has been requested.
+./your-tool-name --command1 arg1 arg2 --command2 arg1 arg2
+```
+If you want to disable this feature and allow only one command to be executed you can disable it with the below function.
+```C
+tool_builder_set_mc(c_builder, state);
+```
+Where c_builder is the builder and the state can be '1' or '0' depents if you want the feature enabled or not.
+
+## Prepare
+To prepare the tool to execute the requested commands the below function must be called.
+```C
+tool_builder_prepare(argc, argv, c_builder)
+```
+The `tool_builder_prepare` function has 3 parameters. The first parameter is the argc of main, the second is the argv of main and the third is the builder.
+This function prepares the tool to execute the commands that the user has typed. The tool supports multiple commands in a line in terminal.
+
+## Execution
+To execute the commands that the user has typed you have to call the below function in the main.
+```C
+tool_builder_execute();
+```
+The `tool_builder_execute` function has 0 parameters. This function is responsible for the execution of all the commands that the user has typed.
 
 ## Destroying
 Once you have completed all the procedures you have to do with the builder you should free up the memory that the library is using. To do this you can call the following function. 

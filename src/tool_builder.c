@@ -1,6 +1,7 @@
 #include <string.h>
 #include <stdarg.h>
 #include <tool_builder.h>
+#include <queue.h>
 
 
 // Priavte implementation of structs.
@@ -32,6 +33,9 @@ struct tool_builder_command
 static inline struct tool_builder_command *find_command(const struct tool_builder_command *commands, const char *c_name,
                                                         int commandsc);
 
+static struct tb_queue c_queue;
+
+
 static void help_defualt_action(const struct tool_builder_args *info)
 {
 	// Prints the help message.
@@ -62,7 +66,8 @@ void tool_builder_init(struct tool_builder *c_builder)
 {
         memset(c_builder, 0x0, sizeof(struct tool_builder));
 	c_builder->t_commands = (struct tool_builder_command *) calloc(1, sizeof(struct tool_builder_command));
-	c_builder->t_commandsc = 0;
+	c_builder->t_commandsc = 0x0;
+	c_builder->t_mc = 0x1;
 }
 
 void tool_builder_destroy(struct tool_builder *c_builder)
@@ -289,35 +294,66 @@ int tool_builder_call_command(const char *c_name, const struct tool_builder *c_b
 int tool_builder_prepare(int argc, char *argv[], const struct tool_builder *c_builder)
 {
 
-
-}
-
-int tool_builder_execute(int argc, char *argv[], const struct tool_builder *c_builder)
-{
 	if (argv[1] == NULL) return TOOL_BUILDER_EMPTY_NAME;
 
+	tb_queue_init(&c_queue);
 
-	// Get the requested command to execute.
-	struct tool_builder_command *command = find_command((const struct tool_builder_command *) c_builder->t_commands, argv[1],
-                                                            c_builder->t_commandsc);
+	struct tool_builder_command *c_curr;
+	struct tb_queue_node_d c_data;
 	
-	if (command == NULL) return TOOL_BUILDER_WRONG_NAME_OR_ALIAS;
+	memset(&c_data, 0x0, sizeof(struct tb_queue_node_d));
 
-	if (((argc - 2) - command->c_argc) < 0) return TOOL_BUILDER_WRONG_ARG_NUM;
+	char *(*command) = (++argv); // point to the first command.
 
-	if (command->c_callback == NULL) return TOOL_BUILDER_NO_ACTION_DEFINED;
+	while (*command)
+	{
+		c_curr = find_command((const struct tool_builder_command *) c_builder->t_commands, *command,
+                                      c_builder->t_commandsc);
+		if (c_curr == NULL) return TOOL_BUILDER_NO_SUCH_COMMAND_EXISTS;
+		if (c_curr->c_callback == NULL) return TOOL_BUILDER_NO_ACTION_DEFINED;
 
-	// Build the info to recieve the call back.
-	struct tool_builder_args exec_inf;
-	memset(&exec_inf, 0x0, sizeof(struct tool_builder_args));
-	exec_inf.c_name = command->c_name;
-	exec_inf.c_used_alias = argv[1];
-	exec_inf.c_argc = command->c_argc;
-	exec_inf.c_values = (command->c_argc > 0)? (argv + 2): NULL;	// This points to the first argument of the requested command.
-	exec_inf.c_builder = (struct tool_builder *) c_builder;
+		c_data.c_args.c_name = c_curr->c_name;
+		c_data.c_args.c_used_alias = *command;
+		c_data.c_args.c_argc = c_curr->c_argc;
+		c_data.c_args.c_values = (char **) malloc(sizeof(char *) * (c_curr->c_argc + 1));
+		c_data.c_args.c_builder = (struct tool_builder *) c_builder;
+		c_data.c_callback = c_curr->c_callback;
 
-	// Call the callback with the values.
-	command->c_callback(&exec_inf);
+		// store the values.
+		for (int v = 0; v < c_curr->c_argc; v++)
+		{
+			c_data.c_args.c_values[v] = ( *(command + v + 1) == NULL )? NULL : *(command + v + 1);
+			if (	c_data.c_args.c_values[v] == NULL  
+				||
+			   	find_command((const struct tool_builder_command *) c_builder->t_commands, *(command + v + 1),
+                                      	     c_builder->t_commandsc) != NULL
+			   )
+			{
+				free(c_data.c_args.c_values);
+				tb_queue_destroy(&c_queue);
+				return TOOL_BUILDER_WRONG_ARG_NUM;
+			}
+		}
+		c_data.c_args.c_values[c_curr->c_argc] = NULL;
+		tb_queue_enqueue(&c_data, &c_queue);
+		command += c_data.c_args.c_argc + 1;
+
+		if (!c_builder->t_mc) break;
+	}
 
 	return 0;
+}
+
+void tool_builder_execute()
+{
+	// execute each command in the queue.
+	struct tb_queue_node_d c_to_exec;
+	memset(&c_to_exec, 0x0, sizeof(struct tb_queue_node_d));
+
+	while (!tb_queue_is_empty(&c_queue))
+	{
+		tb_queue_dequeue(&c_to_exec, &c_queue);
+		c_to_exec.c_callback(&c_to_exec.c_args);
+		free(c_to_exec.c_args.c_values);
+	}
 }

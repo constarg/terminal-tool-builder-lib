@@ -36,6 +36,7 @@ struct tool_builder
 	struct tool_builder_command *t_commands;		// array of commands.
 	int t_commandsc;					// The number of the commands.
 	struct tool_builder_help t_help;			// The help of the tool.
+	int t_mc: 1;						// enable or disable multiple commands in one line.
 };
 
 struct tool_builder_args 
@@ -172,23 +173,13 @@ extern int tool_builder_set_action(struct tool_builder *c_builder, const char *c
                                    void (*c_callback)(const struct tool_builder_args *info));
 
 
+
+extern int tool_builder_prepare(int argc, char *argv[], const struct tool_builder *c_builder);
+
 /**
-	Execute the action that has been requested.
-	@param argc The argc parameter of the main function.
-	@param argv The argv parameter of the main function.
-	@param c_builder The bulder who has the information for each command.
-	@return On success 0 is returned. On error on integer error is returned.
-	Errors can be:
-		Wrong argument number: -1
-		Wrong command name or alias: -2
-		Empty command name: -3
-		No action defined: -4	-> when no call back exists.
-		failed to make exec info: -5
-		builder is not initiaized: -6
-		
-	each error has a MACRO that can be used in if statements.
+	Execute the actions that has been requested.
 */
-int tool_builder_execute(int argc, char *argv[], const struct tool_builder *c_builder);
+extern void tool_builder_execute();
 
 /**
  *     Execute a command with no values!. With this function you can
@@ -200,6 +191,18 @@ int tool_builder_execute(int argc, char *argv[], const struct tool_builder *c_bu
  *          Wrong command name or alias: -2
  */
 int tool_builder_call_command(const char *c_name, const struct tool_builder *c_builder);
+
+
+/**
+ *     Enable or diable the feature to execute multiple commands in one
+ *     line.
+ *     @param state The new state of multiple commands enable variable.
+ *     @param c_builder The builder.
+*/
+static void inline tool_builder_set_mc(struct tool_builder *c_builder, int state)
+{
+	c_builder->t_mc = state & 0x01;
+}
 
 static int inline tool_builder_add_both(struct tool_builder *c_builder, const char *c_name,
                                         int c_argc, void (*c_callback)(const struct tool_builder_args *info),

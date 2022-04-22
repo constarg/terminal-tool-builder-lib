@@ -62,9 +62,13 @@ int main(int argc, char *argv[]) {
 	tool_builder_add_alias(&builder, "Testing", "Test", "t", "te", NULL);
         tool_builder_add_alias_doc(&builder, "Testing");
 
-        tool_builder_call_command("--help", &builder);
+        //tool_builder_call_command("--help", &builder);
 
-	int error = tool_builder_execute(argc, argv, &builder);
+	//tool_builder_set_mc(&builder, 0);
+
+	int error = tool_builder_prepare(argc, argv, &builder);
+	tool_builder_execute();
+
 	printf("Error = %d\n", error);
 
 	tool_builder_destroy(&builder);	
