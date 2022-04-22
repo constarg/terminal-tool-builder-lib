@@ -36,7 +36,7 @@ static inline void tb_queue_init(struct tb_queue *queue)
 static inline void tb_queue_destroy(struct tb_queue *queue)
 {
 	struct tb_queue_node *tmp = queue->front->next;
-	while(tmp)
+	while(tmp || queue->front)
 	{
 		free(queue->front);
 		queue->front = tmp;

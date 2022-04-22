@@ -1,6 +1,7 @@
 #include <string.h>
 #include <stdarg.h>
 #include <tool_builder.h>
+#include <queue.h>
 
 
 // Priavte implementation of structs.
@@ -31,6 +32,9 @@ struct tool_builder_command
 
 static inline struct tool_builder_command *find_command(const struct tool_builder_command *commands, const char *c_name,
                                                         int commandsc);
+
+static struct tb_queue c_queue;
+
 
 static void help_defualt_action(const struct tool_builder_args *info)
 {
@@ -289,13 +293,7 @@ int tool_builder_call_command(const char *c_name, const struct tool_builder *c_b
 
 int tool_builder_prepare(int argc, char *argv[], const struct tool_builder *c_builder)
 {
-
-
-}
-
-int tool_builder_execute(int argc, char *argv[], const struct tool_builder *c_builder)
-{
-	if (argv[1] == NULL) return TOOL_BUILDER_EMPTY_NAME;
+	/*if (argv[1] == NULL) return TOOL_BUILDER_EMPTY_NAME;
 
 
 	// Get the requested command to execute.
@@ -321,4 +319,20 @@ int tool_builder_execute(int argc, char *argv[], const struct tool_builder *c_bu
 	command->c_callback(&exec_inf);
 
 	return 0;
+
+	*/
+}
+
+void tool_builder_execute()
+{
+	// execute each command in the queue.
+	struct tb_queue_node_d c_to_exec;
+
+	while (tb_queue_is_empty(&c_queue))
+	{
+		tb_queue_dequeue(&c_to_exec, &c_queue);
+		c_to_exec.c_callback(&c_to_exec.c_args);
+	}
+
+	tb_queue_destroy(&c_queue);
 }
