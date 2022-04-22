@@ -44,4 +44,5 @@ void tb_queue_dequeue(struct tb_queue_node_d *dst, struct tb_queue *queue)
 		curr = tmp;
 		tmp = curr->next;
 	}
+	free(removed);
 }
