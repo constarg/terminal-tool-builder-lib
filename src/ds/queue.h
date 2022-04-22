@@ -38,10 +38,12 @@ static inline void tb_queue_destroy(struct tb_queue *queue)
 	struct tb_queue_node *tmp = queue->front->next;
 	while(tmp || queue->front)
 	{
+		free(queue->front->data.c_args.c_values);
 		free(queue->front);
 		queue->front = tmp;
 		tmp = queue->front->next;
 	}
+	memset(queue, 0x0, sizeof(struct tb_queue));
 }
 
 static inline int tb_queue_is_empty(struct tb_queue *queue)
