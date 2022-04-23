@@ -84,6 +84,9 @@ void tool_builder_init(struct tool_builder *c_builder);
 #### Arguments
 `c_builder` Is a pointer to the builder to be used.
 
+#### return
+
+
 #### Example
 ```C
 struct tool_builder builder;
@@ -97,11 +100,12 @@ ___
 
 #### Function signature
 ```C
-
+void tool_builder_destroy(struct tool_builder *c_builder);
 ```
 
 #### Arguments
 
+#### return
 
 #### Example
 ```C
@@ -121,9 +125,12 @@ ___
 
 #### Arguments
 
+#### return
 
 #### Example
 ```C
+int tool_builder_add_command(struct tool_builder *c_builder, const char *c_name, 
+                             int c_argc, void (*c_callback)(const struct tool_builder_args *info));
 
 ```
 
@@ -135,11 +142,12 @@ ___
 
 #### Function signature
 ```C
-
+int tool_builder_add_alias(struct tool_builder *c_builder, const char *c_name, const char *c_alias, ...);
 ```
 
 #### Arguments
 
+#### return
 
 #### Example
 ```C
@@ -155,6 +163,9 @@ ___
 
 #### Function signature
 ```C
+int inline tool_builder_add_both(struct tool_builder *c_builder, const char *c_name,
+                                 int c_argc, void (*c_callback)(const struct tool_builder_args *info),
+                                 const char *c_description)
 
 ```
 
@@ -166,6 +177,7 @@ ___
 
 ```
 
+#### return
 
 ___
 ### tool_builder_add_alias_both
@@ -176,11 +188,14 @@ ___
 
 #### Function signature
 ```C
+int inline tool_builder_add_alias_both(struct tool_builder *c_builder, const char *c_name, 
+                                       const char *c_alias, ...)
 
 ```
 
 #### Arguments
 
+#### return
 
 #### Example
 ```C
@@ -196,11 +211,14 @@ ___
 
 #### Function signature
 ```C
+int tool_builder_set_action(struct tool_builder *c_builder, const char *c_name, 
+                            void (*c_callback)(const struct tool_builder_args *info));
 
 ```
 
 #### Arguments
 
+#### return
 
 #### Example
 ```C
@@ -217,11 +235,13 @@ ___
 
 #### Function signature
 ```C
+int tool_builder_prepare(int argc, char *argv[], const struct tool_builder *c_builder);
 
 ```
 
 #### Arguments
 
+#### return
 
 #### Example
 ```C
@@ -238,11 +258,12 @@ ___
 
 #### Function signature
 ```C
-
+void tool_builder_execute();
 ```
 
 #### Arguments
 
+#### return
 
 #### Example
 ```C
@@ -259,11 +280,12 @@ ___
 
 #### Function signature
 ```C
-
+int tool_builder_call_command(const char *c_name, const struct tool_builder *c_builder);
 ```
 
 #### Arguments
 
+#### return
 
 #### Example
 ```C
@@ -280,11 +302,12 @@ ___
 
 #### Function signature
 ```C
-
+int tool_builder_init_help(struct tool_builder *c_builder, const char *tool_name);
 ```
 
 #### Arguments
 
+#### return
 
 #### Example
 ```C
@@ -300,11 +323,12 @@ ___
 
 #### Function signature
 ```C
-
+int tool_builder_set_desc(struct tool_builder *c_builder, const char *c_description);
 ```
 
 #### Arguments
 
+#### return
 
 #### Example
 ```C
@@ -321,11 +345,14 @@ ___
 
 #### Function signature
 ```C
+int tool_builder_add_command_doc(struct tool_builder *c_builder, const char *c_name,
+                                 const char *c_description);
 
 ```
 
 #### Arguments
 
+#### return
 
 #### Example
 ```C
@@ -342,11 +369,12 @@ ___
 
 #### Function signature
 ```C
-
+int tool_builder_add_alias_doc(struct tool_builder *c_builder, const char *c_name);
 ```
 
 #### Arguments
 
+#### return
 
 #### Example
 ```C
@@ -364,11 +392,12 @@ ___
 
 #### Function signature
 ```C
-
+int tool_builder_set_closing_desc(struct tool_builder *c_builder, const char *close_description);
 ```
 
 #### Arguments
 
+#### return
 
 #### Example
 ```C
