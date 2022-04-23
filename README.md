@@ -125,7 +125,7 @@ void tool_builder_destroy(struct tool_builder *c_builder);
 ```
 
 #### Arguments
-`c_builder` The builder used and no longer needed.
+`c_builder` Is pointer to the builder used and no longer needed.
 #### return
 --
 
@@ -141,22 +141,45 @@ ___
 ### tool_builder_add_command
 ___
 #### Description
-
+The tool_builder_add_command function adds a new command to the tool. This means that if a user using the tool you created calls the command name specified in this function, a certain action that is also defined in this function will be performed.
 
 #### Function signature
 ```C
-
+int tool_builder_add_command(struct tool_builder *c_builder, const char *c_name, 
+                             int c_argc, void (*c_callback)(const struct tool_builder_args *info));
 ```
 
 #### Arguments
+`c_builder` Is a pointer to the builder to be used.<br>
+`c_name` The name of the command.<br>
+`c_argc` The number of parameters required by the command.<br>
+`c_callback` The action to be taken if the user requests this command. The function that plays the role of the command action must have the below signature 
+```C
+void your_action(const struct tool_builder_args *info);
+```
+All information about the command inputs is given as a parameter in this action. Check tool_builder_args struct for more details.
 
 #### return
+It returns zero when everything went well. In the event of an error, one of the following may be returned.
+
+#### Errors
+`TOOL_BUILDER_FAILED_TO_ADD`
 
 #### Example
 ```C
-int tool_builder_add_command(struct tool_builder *c_builder, const char *c_name, 
-                             int c_argc, void (*c_callback)(const struct tool_builder_args *info));
+void testing_command_action(const struct tool_builder_args *info)
+{
+	// code.
+}
 
+int main(int argc, char *argv[])
+{
+	struct tool_builder builder;
+	tool_builder_init(&builder);
+	tool_builder_add_command(&builder, "Testing", 2, &testing_command_action);
+	// code.
+	tool_builder_destroy(&builder);
+}
 ```
 
 ___
