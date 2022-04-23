@@ -54,7 +54,7 @@ This library is designed to make it easy to create tools that run on the termina
 
 ### Version
 ```C
-TOOL_BUILDER_V 	1.6
+#define TOOL_BUILDER_V 	1.6
 
 ```
 
