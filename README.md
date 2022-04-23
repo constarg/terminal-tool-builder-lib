@@ -232,57 +232,6 @@ int main(int argc, char *argv[])
 ```
 
 ___
-### tool_builder_add_both
-___
-
-#### Description
-
-
-#### Function signature
-```C
-int inline tool_builder_add_both(struct tool_builder *c_builder, const char *c_name,
-                                 int c_argc, void (*c_callback)(const struct tool_builder_args *info),
-                                 const char *c_description)
-
-```
-
-#### Arguments
-
-#### return
-
-#### Errors
-
-#### Example
-```C
-
-```
-
-___
-### tool_builder_add_alias_both
-___
-
-#### Description
-
-
-#### Function signature
-```C
-int inline tool_builder_add_alias_both(struct tool_builder *c_builder, const char *c_name, 
-                                       const char *c_alias, ...)
-
-```
-
-#### Arguments
-
-#### return
-
-#### Errors
-
-#### Example
-```C
-
-```
-
-___
 ### tool_builder_set_actions
 ___
 
@@ -489,6 +438,59 @@ ___
 #### Function signature
 ```C
 int tool_builder_set_closing_desc(struct tool_builder *c_builder, const char *close_description);
+```
+
+#### Arguments
+
+#### return
+
+#### Errors
+
+#### Example
+```C
+
+```
+
+
+
+___
+### tool_builder_add_both
+___
+
+#### Description
+
+
+#### Function signature
+```C
+int inline tool_builder_add_both(struct tool_builder *c_builder, const char *c_name,
+                                 int c_argc, void (*c_callback)(const struct tool_builder_args *info),
+                                 const char *c_description)
+
+```
+
+#### Arguments
+
+#### return
+
+#### Errors
+
+#### Example
+```C
+
+```
+
+___
+### tool_builder_add_alias_both
+___
+
+#### Description
+
+
+#### Function signature
+```C
+int inline tool_builder_add_alias_both(struct tool_builder *c_builder, const char *c_name, 
+                                       const char *c_alias, ...)
+
 ```
 
 #### Arguments
