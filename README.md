@@ -52,6 +52,11 @@ This library is designed to make it easy to create tools that run on the termina
 #define TOOL_BUILDER_NO_SUCH_COMMAND_EXISTS	-7	// The command that was requested does not exists.
 ```
 
+### Version
+```C
+TOOL_BUILDER_V 	1.6
+
+```
 
 ## Library Stractures
 
