@@ -163,7 +163,7 @@ All information about the command inputs is given as a parameter in this action.
 It returns zero when everything went well. In the event of an error, one of the following may be returned.
 
 #### Errors
-`TOOL_BUILDER_FAILED_TO_ADD`
+`TOOL_BUILDER_FAILED_TO_ADD` Failed to add the new command.
 
 #### Example
 ```C
