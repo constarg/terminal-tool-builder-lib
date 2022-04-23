@@ -70,7 +70,9 @@ struct tool_builder_args
 
 ## Library functions
 
+___
 ### tool_builder_init
+___
 #### Description
 The **tool_builder_init** function initializes the tool builder. <br>
 
@@ -87,8 +89,9 @@ void tool_builder_init(struct tool_builder *c_builder);
 struct tool_builder builder;
 tool_builder_init(&builder);
 ```
-  
+___
 ### tool_builder_destroy
+___
 #### Description
 
 
@@ -105,11 +108,9 @@ tool_builder_init(&builder);
 
 ```
 
-
-
-
+___
 ### tool_builder_add_command
-
+___
 #### Description
 
 
@@ -126,9 +127,9 @@ tool_builder_init(&builder);
 
 ```
 
-
-
+___
 ### tool_builder_add_alias
+___
 #### Description
 
 
@@ -145,9 +146,9 @@ tool_builder_init(&builder);
 
 ```
 
-
-
+___
 ### tool_builder_add_both
+___
 
 #### Description
 
@@ -166,9 +167,9 @@ tool_builder_init(&builder);
 ```
 
 
-
-
+___
 ### tool_builder_add_alias_both
+___
 
 #### Description
 
@@ -186,9 +187,9 @@ tool_builder_init(&builder);
 
 ```
 
-
-
+___
 ### tool_builder_set_actions
+___
 
 #### Description
 
@@ -207,10 +208,10 @@ tool_builder_init(&builder);
 ```
 
 
-
-
-
+___
 ### tool_builder_prepare
+___
+
 #### Description
 
 
@@ -228,9 +229,10 @@ tool_builder_init(&builder);
 ```
 
 
-
-
+___
 ### tool_builder_execute
+___
+
 #### Description
 
 
@@ -248,9 +250,10 @@ tool_builder_init(&builder);
 ```
 
 
-
-
+___
 ### tool_builder_call_command
+___
+
 #### Description
 
 
@@ -268,9 +271,10 @@ tool_builder_init(&builder);
 ```
 
 
-
-
+___
 ### tool_builder_init_help
+___
+
 #### Description
 
 
@@ -288,9 +292,9 @@ tool_builder_init(&builder);
 ```
 
 
-
-
+___
 ### tool_builder_set_desc
+___
 #### Description
 
 
@@ -308,11 +312,10 @@ tool_builder_init(&builder);
 ```
 
 
-
-
-
-
+___
 ### tool_builder_add_command_doc
+___
+
 #### Description
 
 
@@ -330,11 +333,10 @@ tool_builder_init(&builder);
 ```
 
 
-
-
-
-
+___
 ### tool_builder_add_alias_doc
+___
+
 #### Description
 
 
@@ -353,10 +355,9 @@ tool_builder_init(&builder);
 
 
 
-
-
-
+___
 ### tool_builder_set_closing_desc
+___
 
 #### Description
 
