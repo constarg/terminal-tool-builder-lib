@@ -85,7 +85,7 @@ void tool_builder_init(struct tool_builder *c_builder);
 `c_builder` Is a pointer to the builder to be used.
 
 #### return
-
+--
 
 #### Example
 ```C
@@ -171,13 +171,12 @@ int inline tool_builder_add_both(struct tool_builder *c_builder, const char *c_n
 
 #### Arguments
 
+#### return
 
 #### Example
 ```C
 
 ```
-
-#### return
 
 ___
 ### tool_builder_add_alias_both
