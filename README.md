@@ -87,34 +87,292 @@ void tool_builder_init(struct tool_builder *c_builder);
 struct tool_builder builder;
 tool_builder_init(&builder);
 ```
-
+  
 ### tool_builder_destroy
+#### Description
+
+
+#### Function signature
+```C
+
+```
+
+#### Arguments
+
+
+#### Example
+```C
+
+```
+
+
+
 
 ### tool_builder_add_command
 
+#### Description
+
+
+#### Function signature
+```C
+
+```
+
+#### Arguments
+
+
+#### Example
+```C
+
+```
+
+
+
 ### tool_builder_add_alias
+#### Description
+
+
+#### Function signature
+```C
+
+```
+
+#### Arguments
+
+
+#### Example
+```C
+
+```
+
+
 
 ### tool_builder_add_both
 
+#### Description
+
+
+#### Function signature
+```C
+
+```
+
+#### Arguments
+
+
+#### Example
+```C
+
+```
+
+
+
+
 ### tool_builder_add_alias_both
+
+#### Description
+
+
+#### Function signature
+```C
+
+```
+
+#### Arguments
+
+
+#### Example
+```C
+
+```
+
+
 
 ### tool_builder_set_actions
 
+#### Description
+
+
+#### Function signature
+```C
+
+```
+
+#### Arguments
+
+
+#### Example
+```C
+
+```
+
+
+
+
+
 ### tool_builder_prepare
+#### Description
+
+
+#### Function signature
+```C
+
+```
+
+#### Arguments
+
+
+#### Example
+```C
+
+```
+
+
+
 
 ### tool_builder_execute
+#### Description
+
+
+#### Function signature
+```C
+
+```
+
+#### Arguments
+
+
+#### Example
+```C
+
+```
+
+
+
 
 ### tool_builder_call_command
+#### Description
+
+
+#### Function signature
+```C
+
+```
+
+#### Arguments
+
+
+#### Example
+```C
+
+```
+
+
+
 
 ### tool_builder_init_help
+#### Description
+
+
+#### Function signature
+```C
+
+```
+
+#### Arguments
+
+
+#### Example
+```C
+
+```
+
+
+
 
 ### tool_builder_set_desc
+#### Description
+
+
+#### Function signature
+```C
+
+```
+
+#### Arguments
+
+
+#### Example
+```C
+
+```
+
+
+
+
+
 
 ### tool_builder_add_command_doc
+#### Description
+
+
+#### Function signature
+```C
+
+```
+
+#### Arguments
+
+
+#### Example
+```C
+
+```
+
+
+
+
+
 
 ### tool_builder_add_alias_doc
+#### Description
+
+
+#### Function signature
+```C
+
+```
+
+#### Arguments
+
+
+#### Example
+```C
+
+```
+
+
+
+
+
 
 ### tool_builder_set_closing_desc
+
+#### Description
+
+
+#### Function signature
+```C
+
+```
+
+#### Arguments
+
+
+#### Example
+```C
+
+```
 
 
 
