@@ -37,6 +37,22 @@ After this the program will be installed and ready to run.
 # Documentation
 This library is designed to make it easy to create tools that run on the terminal. Below it will be analyzed how it can be used.
 
+## Library Macros
+
+### Errors
+```C
+#define TOOL_BUILDER_WRONG_ARG_NUM              -1	// Wrong argument number.
+#define TOOL_BUILDER_WRONG_NAME_OR_ALIAS        -2      // Wrong name or alias.
+
+#define TOOL_BUILDER_EMPTY_NAME	                -3	// No command has been requested.
+
+#define TOOL_BUILDER_NO_ACTION_DEFINED	        -4	// No function has been defined for the specific command.
+#define TOOL_BUILDER_FAILED_TO_ADD              -5	// Failed to add an element to the builder.
+
+#define TOOL_BUILDER_NO_SUCH_COMMAND_EXISTS	-7	// The command that was requested does not exists.
+```
+
+
 ## Library Stractures
 
 ### tool_builder
