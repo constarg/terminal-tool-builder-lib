@@ -4,7 +4,7 @@
 #include <malloc.h>
 #include <string.h>
 
-#define TOOL_BUILDER_V 				 1.5
+#define TOOL_BUILDER_V 				 1.6
 
 // errors
 #define TOOL_BUILDER_WRONG_ARG_NUM              -1
@@ -190,7 +190,7 @@ extern void tool_builder_execute();
  *     Errors can be:
  *          Wrong command name or alias: -2
  */
-int tool_builder_call_command(const char *c_name, const struct tool_builder *c_builder);
+extern int tool_builder_call_command(const char *c_name, const struct tool_builder *c_builder);
 
 
 /**
