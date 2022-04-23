@@ -208,8 +208,8 @@ int tool_builder_add_alias(struct tool_builder *c_builder, const char *c_name, c
 It returns zero when everything went well. In the event of an error, one of the following may be returned.
 
 #### Errors
-`TOOL_BUILDER_NO_SUCH_COMMAND_EXISTS`
-`TOOL_BUILDER_FAILED_TO_ADD`
+`TOOL_BUILDER_NO_SUCH_COMMAND_EXISTS` The command to which it went to add the aliases does not exist.<br>
+`TOOL_BUILDER_FAILED_TO_ADD` Failed to add the aliases.
 
 #### Example
 ```C
