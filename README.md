@@ -112,7 +112,7 @@ ___
 ### tool_builder_destroy
 ___
 #### Description
-
+The **tool_builder_destroy** function frees the memory that the builder has reserved. It should be called when the builder is no longer useful.
 
 #### Function signature
 ```C
@@ -120,12 +120,16 @@ void tool_builder_destroy(struct tool_builder *c_builder);
 ```
 
 #### Arguments
-
+`c_builder` The builder used and no longer needed.
 #### return
+--
 
 #### Example
 ```C
-
+struct tool_builder builder;
+tool_builder_init(&builder);
+... code ...
+tool_builder_destroy(&builder);
 ```
 
 ___
