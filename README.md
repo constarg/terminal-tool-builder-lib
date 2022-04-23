@@ -108,6 +108,9 @@ void tool_builder_init(struct tool_builder *c_builder);
 #### return
 --
 
+#### Errors
+--
+
 #### Example
 ```C
 struct tool_builder builder;
@@ -127,6 +130,9 @@ void tool_builder_destroy(struct tool_builder *c_builder);
 #### Arguments
 `c_builder` Is pointer to the builder used and no longer needed.
 #### return
+--
+
+#### Errors
 --
 
 #### Example
@@ -197,6 +203,8 @@ int tool_builder_add_alias(struct tool_builder *c_builder, const char *c_name, c
 
 #### return
 
+#### Errors
+
 #### Example
 ```C
 
@@ -221,6 +229,8 @@ int inline tool_builder_add_both(struct tool_builder *c_builder, const char *c_n
 
 #### return
 
+#### Errors
+
 #### Example
 ```C
 
@@ -243,6 +253,8 @@ int inline tool_builder_add_alias_both(struct tool_builder *c_builder, const cha
 #### Arguments
 
 #### return
+
+#### Errors
 
 #### Example
 ```C
@@ -267,6 +279,8 @@ int tool_builder_set_action(struct tool_builder *c_builder, const char *c_name,
 
 #### return
 
+#### Errors
+
 #### Example
 ```C
 
@@ -290,6 +304,8 @@ int tool_builder_prepare(int argc, char *argv[], const struct tool_builder *c_bu
 
 #### return
 
+#### Errors
+
 #### Example
 ```C
 
@@ -311,6 +327,8 @@ void tool_builder_execute();
 #### Arguments
 
 #### return
+
+#### Errors
 
 #### Example
 ```C
@@ -334,6 +352,8 @@ int tool_builder_call_command(const char *c_name, const struct tool_builder *c_b
 
 #### return
 
+#### Errors
+
 #### Example
 ```C
 
@@ -356,6 +376,8 @@ int tool_builder_init_help(struct tool_builder *c_builder, const char *tool_name
 
 #### return
 
+#### Errors
+
 #### Example
 ```C
 
@@ -376,6 +398,8 @@ int tool_builder_set_desc(struct tool_builder *c_builder, const char *c_descript
 #### Arguments
 
 #### return
+
+#### Errors
 
 #### Example
 ```C
@@ -401,6 +425,8 @@ int tool_builder_add_command_doc(struct tool_builder *c_builder, const char *c_n
 
 #### return
 
+#### Errors
+
 #### Example
 ```C
 
@@ -422,6 +448,8 @@ int tool_builder_add_alias_doc(struct tool_builder *c_builder, const char *c_nam
 #### Arguments
 
 #### return
+
+#### Errors
 
 #### Example
 ```C
@@ -445,6 +473,8 @@ int tool_builder_set_closing_desc(struct tool_builder *c_builder, const char *cl
 #### Arguments
 
 #### return
+
+#### Errors
 
 #### Example
 ```C
