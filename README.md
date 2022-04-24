@@ -192,7 +192,7 @@ ___
 ### tool_builder_add_alias
 ___
 #### Description
-The tool_builder_add_alias function looks like the tool_builder_add_command function. The difference is that instead of adding a new command, it adds to a specific command 1, 2, .... , n names that describe the same command. Such names could be abbreviations, in order to make it easier for the user to remember.
+The **tool_builder_add_alias** function looks like the tool_builder_add_command function. The difference is that instead of adding a new command, it adds to a specific command 1, 2, .... , n names that describe the same command. Such names could be abbreviations, in order to make it easier for the user to remember.
 
 #### Function signature
 ```C
@@ -236,7 +236,7 @@ ___
 ___
 
 #### Description
-The tool_builder_set_action function changes or sets an action on a command.
+The **tool_builder_set_action** function changes or sets an action on a command.
 
 #### Function signature
 ```C
@@ -284,7 +284,7 @@ ___
 ___
 
 #### Description
-
+The **tool_builder_prepare** function makes all the necessary preparations in the builder to execute the command(s) requested by the terminal.
 
 #### Function signature
 ```C
@@ -293,13 +293,36 @@ int tool_builder_prepare(int argc, char *argv[], const struct tool_builder *c_bu
 ```
 
 #### Arguments
+`argc` The number of parameters given in the executable. Given by the main function.<br>
+`argv` Pointer that pointes to the first parameter. Given by the main function.<br>
+`c_builder` Is a pointer to the builder to be used.
 
 #### Return
+It returns zero when everything went well. In the event of an error, one of the following may be returned.
 
 #### Errors
+`TOOL_BUILDER_EMPTY_NAME` No executable parameters were given<br>
+`TOOL_BUILDER_NO_SUCH_COMMAND_EXISTS` The parameter given to the executable does not correspond to a command.<br>
+`TOOL_BUILDER_NO_ACTION_DEFINED` The requested command does not have a specified action.<br>
+`TOOL_BUILDER_WRONG_ARG_NUM` The parameters provided are not sufficient for the requested command.
 
 #### Example
 ```C
+void testing_command_action(const struct tool_builder_args *info)
+{
+	// code.
+}
+
+int main(int argc, char *argv[])
+{
+	struct tool_builder builder;
+	tool_builder_init(&builder);
+	tool_builder_add_command(&builder, "Testing", 2, &testing_command_action);
+	// prepare for execution.
+	tool_builder_prepare(argc, argv, &builder);
+	// code.
+	tool_builder_destroy(&builder);
+}
 
 ```
 
