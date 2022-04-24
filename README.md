@@ -105,7 +105,7 @@ void tool_builder_init(struct tool_builder *c_builder);
 #### Arguments
 `c_builder` Is a pointer to the builder to be used.
 
-#### return
+#### Return
 --
 
 #### Errors
@@ -129,7 +129,7 @@ void tool_builder_destroy(struct tool_builder *c_builder);
 
 #### Arguments
 `c_builder` Is pointer to the builder used and no longer needed.
-#### return
+#### Return
 --
 
 #### Errors
@@ -165,7 +165,7 @@ void your_action(const struct tool_builder_args *info);
 ```
 All information about the command inputs is given as a parameter in this action. Check **tool_builder_args** struct for more details.
 
-#### return
+#### Return
 It returns zero when everything went well. In the event of an error, one of the following may be returned.
 
 #### Errors
@@ -204,7 +204,7 @@ int tool_builder_add_alias(struct tool_builder *c_builder, const char *c_name, c
 `c_name` The name of the command to add the aliases.<br>
 `c_alias` The multitude of aliases. The last alias must be NULL.
 
-#### return
+#### Return
 It returns zero when everything went well. In the event of an error, one of the following may be returned.
 
 #### Errors
@@ -247,7 +247,7 @@ int tool_builder_set_action(struct tool_builder *c_builder, const char *c_name,
 
 #### Arguments
 
-#### return
+#### Return
 
 #### Errors
 
@@ -272,7 +272,7 @@ int tool_builder_prepare(int argc, char *argv[], const struct tool_builder *c_bu
 
 #### Arguments
 
-#### return
+#### Return
 
 #### Errors
 
@@ -296,7 +296,7 @@ void tool_builder_execute();
 
 #### Arguments
 
-#### return
+#### Return
 
 #### Errors
 
@@ -320,7 +320,7 @@ int tool_builder_call_command(const char *c_name, const struct tool_builder *c_b
 
 #### Arguments
 
-#### return
+#### Return
 
 #### Errors
 
@@ -344,7 +344,7 @@ int tool_builder_init_help(struct tool_builder *c_builder, const char *tool_name
 
 #### Arguments
 
-#### return
+#### Return
 
 #### Errors
 
@@ -367,7 +367,7 @@ int tool_builder_set_desc(struct tool_builder *c_builder, const char *c_descript
 
 #### Arguments
 
-#### return
+#### Return
 
 #### Errors
 
@@ -393,7 +393,7 @@ int tool_builder_add_command_doc(struct tool_builder *c_builder, const char *c_n
 
 #### Arguments
 
-#### return
+#### Return
 
 #### Errors
 
@@ -417,7 +417,7 @@ int tool_builder_add_alias_doc(struct tool_builder *c_builder, const char *c_nam
 
 #### Arguments
 
-#### return
+#### Return
 
 #### Errors
 
@@ -442,7 +442,7 @@ int tool_builder_set_closing_desc(struct tool_builder *c_builder, const char *cl
 
 #### Arguments
 
-#### return
+#### Return
 
 #### Errors
 
@@ -470,7 +470,7 @@ int inline tool_builder_add_both(struct tool_builder *c_builder, const char *c_n
 
 #### Arguments
 
-#### return
+#### Return
 
 #### Errors
 
@@ -495,7 +495,7 @@ int inline tool_builder_add_alias_both(struct tool_builder *c_builder, const cha
 
 #### Arguments
 
-#### return
+#### Return
 
 #### Errors
 
