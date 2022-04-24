@@ -236,7 +236,7 @@ ___
 ___
 
 #### Description
-
+The tool_builder_set_action function changes or sets an action on a command.
 
 #### Function signature
 ```C
@@ -246,13 +246,35 @@ int tool_builder_set_action(struct tool_builder *c_builder, const char *c_name,
 ```
 
 #### Arguments
+`c_builder` Is a pointer to the builder to be used.<br>
+`c_name` The name of the command that should perform this action.<br>
+`c_callback` The action to be performed on the command.
 
 #### Return
+It returns zero when everything went well. In the event of an error, one of the following may be returned.
 
 #### Errors
+`TOOL_BUILDER_NO_SUCH_COMMAND_EXISTS` The command `c_name` does not exists in the builder.
 
 #### Example
 ```C
+void testing_command_action(const struct tool_builder_args *info)
+{
+	// code.
+}
+
+int main(int argc, char *argv[])
+{
+	struct tool_builder builder;
+	tool_builder_init(&builder);
+	// adding a command without setting an action.
+	tool_builder_add_command(&builder, "Testing", 2, NULL);
+	// set the action.
+	tool_builder_set_action(&builder, "Testing", &testing_command_action);
+	
+	// code.
+	tool_builder_destroy(&builder);
+}
 
 ```
 
