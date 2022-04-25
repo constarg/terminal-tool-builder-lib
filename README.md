@@ -228,7 +228,6 @@ int main(int argc, char *argv[])
 	// code.
 	tool_builder_destroy(&builder);
 }
-
 ```
 
 ___
@@ -433,6 +432,7 @@ int tool_builder_init_help(struct tool_builder *c_builder, const char *tool_name
 `tool_name` The name of the tool.
 
 #### Return
+It returns zero when everything went well. In the event of an error, one of the following may be returned.
 
 #### Errors
 `TOOL_BUILDER_FAILED_TO_ADD` Failed to add the new command or alias.
@@ -461,7 +461,7 @@ ___
 ### tool_builder_set_desc
 ___
 #### Description
-
+The **tool_builder_set_desc** function sets a description of the tool, which will appear when someone calls the --help command.
 
 #### Function signature
 ```C
@@ -469,14 +469,34 @@ int tool_builder_set_desc(struct tool_builder *c_builder, const char *c_descript
 ```
 
 #### Arguments
+`c_builder` Is a pointer to the builder to be used.<br>
+`c_description` A general description of the tool.
 
 #### Return
+It returns zero when everything went well. In the event of an error, one of the following may be returned.
 
 #### Errors
+`TOOL_BUILDER_FAILED_TO_ADD` Failed to add description.
 
 #### Example
 ```C
+void testing_command_action(const struct tool_builder_args *info)
+{
+	// code.
+}
 
+int main(int argc, char *argv[])
+{
+	struct tool_builder builder;
+	tool_builder_init(&builder);
+	tool_builder_add_command(&builder, "Testing", 2, &testing_command_action);
+	// initialize the pre build help command.
+	tool_builder_init_help(&c_builder, "your-tool-name");
+	// set description.
+	tool_builder_set_desc(&c_builder, "A general description of your tool.");
+	
+	tool_builder_destroy(&builder);
+}
 ```
 
 
