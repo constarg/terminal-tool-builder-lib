@@ -34,142 +34,752 @@ https://cmake.org/download/
 
 After this the program will be installed and ready to run.
 
-# Docs
+# Documentation
+This library is designed to make it easy to create tools that run on the terminal. Below it will be analyzed how it can be used.
 
-Below will be analyzed how the library can be used.<br><br>
+## Library Macros
 
-## Initializing the builder
-A variable with type tool_builder can be defined like below
+### Errors
 ```C
-struct tool_builder builder;
-``` 
-To start building you need to initialize the above variable as shown below.
-```C
-tool_builder_init(&builder);
-```
-Done! now your builder is ready to build your tool!.
+#define TOOL_BUILDER_WRONG_ARG_NUM              -1	// Wrong argument number.
+#define TOOL_BUILDER_WRONG_NAME_OR_ALIAS        -2      // Wrong name or alias.
 
-## Initialize help
-The help command is the classic command that all terminal-based tools have. The library has the feature to create automatically this commmand based on the tool's commands. Or the user can ignore it and make his own help command.
-To enable this feature, initiaize the help command as below.
-```C
-tool_builder_init_help(&builder, "tool-name");
-```
-The `tool_builder_init_help` function takes as the first parameter the builder and as a second parameter the name of your tool.
+#define TOOL_BUILDER_EMPTY_NAME	                -3	// No command has been requested.
 
-## Build the help docs
-Putting your own command in the docs of the help command helps the user who will use your tool to understand it.<br>
-The below function will allow you to add a description in your help docs.
-```C
-tool_builder_set_desc(&builder, "Your description");	
-```
-The `tool_builder_set_desc` function require as the first parameter the builder and as a second parameter the description of your docs.<br>
-The below function will allow you to add a closure description, if you like to, in your help docs.
-```C
-tool_builder_set_closing_desc(&builder, "Your closure description");	
-```
-The `tool_builder_set_closing_desc` function require as the first parameter the builder and as a second parametr the closure description you like.<br>
-The below function will allow you to add a command, you support in your tool, in the help docs.
-```C
-tool_builder_add_command_doc(&builder, "your_command_name", "The description of your command");
-```
-The `tool_builder_add_command_doc` takes 3 parameters. The first is the builder, the second is the name of your command and the third is the description of your  command.<br>
-The below function will allow you to add alias to an existing command in the docs.
-```C
-tool_builder_add_alias_doc(&builder, "your_command_name");
-```
-The `tool_builder_add_alias_doc` the first parameter of this function is the builder and the second parameter is the name of the command to add the aliases.<br>
-**Caution! the aliases are the same as the ones you set when creating the command, will be explained below, so you do not need to re-enter them. That is why they are not requested.**<br><br>
+#define TOOL_BUILDER_NO_ACTION_DEFINED	        -4	// No function has been defined for the specific command.
+#define TOOL_BUILDER_FAILED_TO_ADD              -5	// Failed to add an element to the builder.
 
-**Caution!! if you want to make your own version of the help command the above will not work. The docs will have to be made differently.**
+#define TOOL_BUILDER_NO_SUCH_COMMAND_EXISTS	-7	// The command that was requested does not exists.
+```
 
-## Commands
-To set a new command for the tool you are creating, all you have to do is call the following function. 
+### Version
 ```C
-tool_builder_add_command(&builder, "command_name", arg, action);
-            		   ^           ^            ^      ^
-        		The builder  Command       args   action
+#define TOOL_BUILDER_V 	1.6
+
 ```
-The `tool_builder_add_command` function takes 4 arguments. The first is the builder, the second is the name of your command, the third is the argumets that your command require in order to run and the forth is the action, callback, to call when this command is called from the terminal. The action is a ballback that is has the below signature.
+
+## Library Structures
+
+### tool_builder
+The builder structure is the most basic element of the library. It contains all the necessary information for the construction of the requested tool.
+#### Stracture definition
 ```C
-void (*c_callback)(const struct tool_builder_args *info)
+struct tool_builder 
+{
+	struct tool_builder_command *t_commands;		// array of commands.
+	int t_commandsc;					// The number of the commands.
+	struct tool_builder_help t_help;			// The help of the tool.
+	int t_mc: 1;						// enable or disable multiple commands in one line.
+};
 ```
-When your command is called from the terminal, the library will return to you the below infos, in the variable info.
+**The user should not be interested in the above definition.**
+
+### tool_builder_args
+The parameter structure is the structure that is "sent" to the user function that executes a command. It is used so that the user (**tool developer**) receives the necessary information about the command that was executed.
+#### Structure definition
 ```C
 struct tool_builder_args 
 {
 	char *c_name;						// The name of the command that has been executed.
 	char *c_used_alias;					// The alias that has been used.
-	char *(*c_values);					// The values that the been retrieved. Must be freed when there is no more use.
+	char *(*c_values);					// The values that has been retrieved.
 	int c_argc;						// The arguments of the command.
 	struct tool_builder *c_builder;				// The builder.
 };
 ```
-With the above function your command will be executed when the user types the `command_name`. But you can also add a few alias
-to help the user and not make him remember a long name.
-In order to add alias to a command you have to call the below function.
-```C
-tool_builder_add_alias(&builder, "command_name", "alias_1", "alias_2", "alias_3", NULL);
-```
-The `tool_builder_add_alias` takes as first parameter the builder, as the second parameter the the command you want to add the aliases and as the third parameter can take an unlimited number of aliases.
-**Cation!!! the last alias must be NULL!**
+**Above is the information he receives.**
 
-## Command Action
+## Library functions
 
-If you want to enter or change the action of a command later you can do so using the following function. 
-```C
-tool_builder_set_action(&builder, "command_name", action);
-```
-The `tool_builder_set_action` function takes three parameters. The first parameter is the builder, the second is the command you want to add the action and the third is the action you want to add.
+___
+### tool_builder_init
+___
+#### Description
+The **tool_builder_init** function initializes the tool builder. <br>
 
-## Shortcuts
-Some of the above functions can be done a bit faster by using only one function, instead of two. 
-Το add a command and at the same time add it in the docs you can use the below function.
+#### Function signature
 ```C
-tool_builder_add_both(&builder, "command_name", args, action, "description")
+void tool_builder_init(struct tool_builder *c_builder);
 ```
-The `tool_builder_add_both` function has 5 parameters. The first is the builder, the second is the name of the command to add, the third is the action to take when the command is called and the fifth is the description to add in the docs, for this specific command.
 
-Α similar shortcut applies to alias.
-```C
-tool_builder_add_alias_both(&builder, "command_name", "alias_1", "alias_2", "alias_3", NULL)
-```
-The `tool_builder_add_alias_both` function takes 2 parameters and an unlimited number of aliases. The first parameter is the builder, the second is the name of the command you want to add the aliases and the rest is the aliases. The defferent with this function is that it will also add the aliases in the docs.<br>
-**Cation!!! the last alias must be NULL!**
+#### Arguments
+`c_builder` Is a pointer to the builder to be used.
 
-## Multiple commands in one line
-The tool by default can execute multiple commands that has been requested, even if it is in one line in terminal.
-For example the below senario requests to execute two commands.
-```
-./your-tool-name --command1 arg1 arg2 --command2 arg1 arg2
-```
-If you want to disable this feature and allow only one command to be executed you can disable it with the below function.
-```C
-tool_builder_set_mc(c_builder, state);
-```
-Where c_builder is the builder and the state can be '1' or '0' depents if you want the feature enabled or not.
+#### Return
+--
 
-## Prepare
-To prepare the tool to execute the requested commands the below function must be called.
-```C
-tool_builder_prepare(argc, argv, c_builder)
-```
-The `tool_builder_prepare` function has 3 parameters. The first parameter is the argc of main, the second is the argv of main and the third is the builder.
-This function prepares the tool to execute the commands that the user has typed. The tool supports multiple commands in a line in terminal.
+#### Errors
+--
 
-## Execution
-To execute the commands that the user has typed you have to call the below function in the main.
+#### Example
 ```C
-tool_builder_execute();
+struct tool_builder builder;
+tool_builder_init(&builder);
 ```
-The `tool_builder_execute` function has 0 parameters. This function is responsible for the execution of all the commands that the user has typed.
+___
+### tool_builder_destroy
+___
+#### Description
+The **tool_builder_destroy** function frees the memory that the builder has reserved. It should be called when the builder is no longer useful.
 
-## Destroying
-Once you have completed all the procedures you have to do with the builder you should free up the memory that the library is using. To do this you can call the following function. 
+#### Function signature
 ```C
+void tool_builder_destroy(struct tool_builder *c_builder);
+```
+
+#### Arguments
+`c_builder` Is pointer to the builder used and no longer needed.
+#### Return
+--
+
+#### Errors
+--
+
+#### Example
+```C
+struct tool_builder builder;
+tool_builder_init(&builder);
+... code ...
 tool_builder_destroy(&builder);
 ```
-The `tool_builder_destroy` function free's the memory that has been allocated for the builder. It has only one parameter and is the builder. 
+
+___
+### tool_builder_add_command
+___
+#### Description
+The **tool_builder_add_command** function adds a new command to the tool. This means that if a user using the tool you created calls the command name specified in this function, a certain action that is also defined in this function will be performed.
+
+#### Function signature
+```C
+int tool_builder_add_command(struct tool_builder *c_builder, const char *c_name, 
+                             int c_argc, void (*c_callback)(const struct tool_builder_args *info));
+```
+
+#### Arguments
+`c_builder` Is a pointer to the builder to be used.<br>
+`c_name` The name of the command.<br>
+`c_argc` The number of parameters required by the command.<br>
+`c_callback` The action to be taken if the user requests this command. The function that plays the role of the command action must have the below signature 
+```C
+void your_action(const struct tool_builder_args *info);
+```
+All information about the command inputs is given as a parameter in this action. Check **tool_builder_args** struct for more details.
+
+#### Return
+It returns zero when everything went well. In the event of an error, one of the following may be returned.
+
+#### Errors
+`TOOL_BUILDER_FAILED_TO_ADD` Failed to add the new command.
+
+#### Example
+```C
+void testing_command_action(const struct tool_builder_args *info)
+{
+	// code.
+}
+
+int main(int argc, char *argv[])
+{
+	struct tool_builder builder;
+	tool_builder_init(&builder);
+	tool_builder_add_command(&builder, "Testing", 2, &testing_command_action);
+	// code.
+	tool_builder_destroy(&builder);
+}
+```
+
+___
+### tool_builder_add_alias
+___
+#### Description
+The **tool_builder_add_alias** function looks like the tool_builder_add_command function. The difference is that instead of adding a new command, it adds to a specific command 1, 2, .... , n names that describe the same command. Such names could be abbreviations, in order to make it easier for the user to remember.
+
+#### Function signature
+```C
+int tool_builder_add_alias(struct tool_builder *c_builder, const char *c_name, const char *c_alias, ...);
+```
+
+#### Arguments
+`c_builder` Is a pointer to the builder to be used.<br>
+`c_name` The name of the command to add the aliases.<br>
+`c_alias` The multitude of aliases. The last alias must be NULL.
+
+#### Return
+It returns zero when everything went well. In the event of an error, one of the following may be returned.
+
+#### Errors
+`TOOL_BUILDER_NO_SUCH_COMMAND_EXISTS` The command to which it went to add the aliases does not exist.<br>
+`TOOL_BUILDER_FAILED_TO_ADD` Failed to add the aliases.
+
+#### Example
+```C
+void testing_command_action(const struct tool_builder_args *info)
+{
+	// code.
+}
+
+int main(int argc, char *argv[])
+{
+	struct tool_builder builder;
+	tool_builder_init(&builder);
+	tool_builder_add_command(&builder, "Testing", 2, &testing_command_action);
+	// add the aliases.
+	tool_builder_add_alias(&builder, "Testing", "Test", "t", "T", NULL);
+	// code.
+	tool_builder_destroy(&builder);
+}
+```
+
+___
+### tool_builder_set_actions
+___
+
+#### Description
+The **tool_builder_set_action** function changes or sets an action on a command.
+
+#### Function signature
+```C
+int tool_builder_set_action(struct tool_builder *c_builder, const char *c_name, 
+                            void (*c_callback)(const struct tool_builder_args *info));
+
+```
+
+#### Arguments
+`c_builder` Is a pointer to the builder to be used.<br>
+`c_name` The name of the command that should perform this action.<br>
+`c_callback` The action to be performed on the command.
+
+#### Return
+It returns zero when everything went well. In the event of an error, one of the following may be returned.
+
+#### Errors
+`TOOL_BUILDER_NO_SUCH_COMMAND_EXISTS` The command `c_name` does not exists in the builder.
+
+#### Example
+```C
+void testing_command_action(const struct tool_builder_args *info)
+{
+	// code.
+}
+
+int main(int argc, char *argv[])
+{
+	struct tool_builder builder;
+	tool_builder_init(&builder);
+	// adding a command without setting an action.
+	tool_builder_add_command(&builder, "Testing", 2, NULL);
+	// set the action.
+	tool_builder_set_action(&builder, "Testing", &testing_command_action);
+	
+	// code.
+	tool_builder_destroy(&builder);
+}
+
+```
+
+
+___
+### tool_builder_prepare
+___
+
+#### Description
+The **tool_builder_prepare** function makes all the necessary preparations in the builder to execute the command(s) requested by the terminal.
+
+#### Function signature
+```C
+int tool_builder_prepare(int argc, char *argv[], const struct tool_builder *c_builder);
+
+```
+
+#### Arguments
+`argc` The number of parameters given in the executable. Given by the main function.<br>
+`argv` Pointer that pointes to the first parameter. Given by the main function.<br>
+`c_builder` Is a pointer to the builder to be used.
+
+#### Return
+It returns zero when everything went well. In the event of an error, one of the following may be returned.
+
+#### Errors
+`TOOL_BUILDER_EMPTY_NAME` No executable parameters were given<br>
+`TOOL_BUILDER_NO_SUCH_COMMAND_EXISTS` The parameter given to the executable does not correspond to a command.<br>
+`TOOL_BUILDER_NO_ACTION_DEFINED` The requested command does not have a specified action.<br>
+`TOOL_BUILDER_WRONG_ARG_NUM` The parameters provided are not sufficient for the requested command.
+
+#### Example
+```C
+void testing_command_action(const struct tool_builder_args *info)
+{
+	// code.
+}
+
+int main(int argc, char *argv[])
+{
+	struct tool_builder builder;
+	tool_builder_init(&builder);
+	tool_builder_add_command(&builder, "Testing", 2, &testing_command_action);
+	// prepare for execution.
+	tool_builder_prepare(argc, argv, &builder);
+	// code.
+	tool_builder_destroy(&builder);
+}
+
+```
+
+
+___
+### tool_builder_execute
+___
+
+#### Description
+The **tool_builder_execute** function is responsible for executing any command requested by the terminal in the executable. If more than one command is given, it will be executed in the order given, from left to right.
+
+#### Function signature
+```C
+void tool_builder_execute();
+```
+
+#### Arguments
+--
+
+#### Return
+--
+
+#### Errors
+--
+
+#### Example
+```C
+void testing_command_action(const struct tool_builder_args *info)
+{
+	// code.
+}
+
+int main(int argc, char *argv[])
+{
+	struct tool_builder builder;
+	tool_builder_init(&builder);
+	tool_builder_add_command(&builder, "Testing", 2, &testing_command_action);
+	// prepare for execution.
+	tool_builder_prepare(argc, argv, &builder);
+	// exete the commands.
+	tool_builder_execute();
+	// code.
+	tool_builder_destroy(&builder);
+}
+```
+
+
+___
+### tool_builder_call_command
+___
+
+#### Description
+The **tool_builder_call_command** function allows the tool developer to execute a tool command without the user requesting it from the terminal.
+
+#### Function signature
+```C
+int tool_builder_call_command(const char *c_name, const struct tool_builder *c_builder);
+```
+
+#### Arguments
+`c_name` The name of the command to be executed.<br>
+`c_builder` The builder who has the information for this command.
+
+#### Return
+It returns zero when everything went well. In the event of an error, one of the following may be returned.
+
+#### Errors
+`TOOL_BUILDER_WRONG_NAME_OR_ALIAS` There is no command with this name.
+#### Example
+```C
+void testing_command_action(const struct tool_builder_args *info)
+{
+	// code.
+}
+
+int main(int argc, char *argv[])
+{
+	struct tool_builder builder;
+	tool_builder_init(&builder);
+	tool_builder_add_command(&builder, "Testing", 2, &testing_command_action);
+	tool_builder_init_help(&c_builder, "your-tool-name");
+	// prepare for execution.
+	if (tool_builder_prepare(argc, argv, &builder) == TOOL_BUILDER_NO_SUCH_COMMAND_EXISTS)
+	{
+		// call the --help command.
+		tool_builder_call_command("--help", &builder);
+	}
+	// code.
+	tool_builder_destroy(&builder);
+}
+```
+
+
+___
+### tool_builder_init_help
+___
+
+#### Description
+The **tool_builder_init_help** function generates a --help command along with the -h aliases and adds it to the tool with a default action. This action can be changed if you do not please the developer.
+
+#### Function signature
+```C
+int tool_builder_init_help(struct tool_builder *c_builder, const char *tool_name);
+```
+
+#### Arguments
+`c_builder` Is a pointer to the builder to be used.<br>
+`tool_name` The name of the tool.
+
+#### Return
+It returns zero when everything went well. In the event of an error, one of the following may be returned.
+
+#### Errors
+`TOOL_BUILDER_FAILED_TO_ADD` Failed to add the new command or alias.
+
+#### Example
+```C
+void testing_command_action(const struct tool_builder_args *info)
+{
+	// code.
+}
+
+int main(int argc, char *argv[])
+{
+	struct tool_builder builder;
+	tool_builder_init(&builder);
+	tool_builder_add_command(&builder, "Testing", 2, &testing_command_action);
+	// initialize the pre build help command.
+	tool_builder_init_help(&builder, "your-tool-name");
+	
+	tool_builder_destroy(&builder);
+}
+```
+
+
+___
+### tool_builder_set_desc
+___
+#### Description
+The **tool_builder_set_desc** function sets a description of the tool, which will appear when someone calls the --help command.
+
+#### Function signature
+```C
+int tool_builder_set_desc(struct tool_builder *c_builder, const char *c_description);
+```
+
+#### Arguments
+`c_builder` Is a pointer to the builder to be used.<br>
+`c_description` A general description of the tool.
+
+#### Return
+It returns zero when everything went well. In the event of an error, one of the following may be returned.
+
+#### Errors
+`TOOL_BUILDER_FAILED_TO_ADD` Failed to add description.
+
+#### Example
+```C
+void testing_command_action(const struct tool_builder_args *info)
+{
+	// code.
+}
+
+int main(int argc, char *argv[])
+{
+	struct tool_builder builder;
+	tool_builder_init(&builder);
+	tool_builder_add_command(&builder, "Testing", 2, &testing_command_action);
+	// initialize the pre build help command.
+	tool_builder_init_help(&builder, "your-tool-name");
+	// set description.
+	tool_builder_set_desc(&builder, "A general description of your tool.");
+	
+	tool_builder_destroy(&builder);
+}
+```
+
+
+___
+### tool_builder_add_command_doc
+___
+
+#### Description
+The **tool_builder_add_command_doc** function adds the name of a command, along with its accompanying description to the tool instructions. These instructions can be displayed using the --help command.
+
+#### Function signature
+```C
+int tool_builder_add_command_doc(struct tool_builder *c_builder, const char *c_name,
+                                 const char *c_description);
+
+```
+
+#### Arguments
+`c_builder` Is a pointer to the builder to be used.<br>
+`c_name` The name of the command to add.<br>
+`c_description` The description of the command.
+
+#### Return
+It returns zero when everything went well. In the event of an error, one of the following may be returned.
+
+#### Errors
+`TOOL_BUILDER_FAILED_TO_ADD` Failed to add the command or description.
+
+#### Example
+```C
+void testing_command_action(const struct tool_builder_args *info)
+{
+	// code.
+}
+
+int main(int argc, char *argv[])
+{
+	struct tool_builder builder;
+	tool_builder_init(&builder);
+	tool_builder_add_command(&builder, "Testing", 2, &testing_command_action);
+	// initialize the pre build help command.
+	tool_builder_init_help(&builder, "your-tool-name");
+	// set description.
+	tool_builder_set_desc(&c_builder, "A general description of your tool.");
+	// add testing command to docs.
+	tool_builder_add_command_doc(&builder, "Testing", "Command description");
+	
+	tool_builder_destroy(&builder);
+}
+```
+
+
+___
+### tool_builder_add_alias_doc
+___
+
+#### Description
+The **tool_builder_add_command_doc** function adds the aliases of a command to the tool instructions. These instructions can be displayed using the --help command. The aliases do not need to be given again because they already exist in the builder. They are in the command structure.
+
+#### Function signature
+```C
+int tool_builder_add_alias_doc(struct tool_builder *c_builder, const char *c_name);
+```
+
+#### Arguments
+`c_builder` Is a pointer to the builder to be used.<br>
+`c_name` The name of the command that has these aliases.
+
+#### Return
+It returns zero when everything went well. In the event of an error, one of the following may be returned.
+
+#### Errors
+`TOOL_BUILDER_NO_SUCH_COMMAND_EXISTS` The command does not exists.
+
+#### Example
+```C
+void testing_command_action(const struct tool_builder_args *info)
+{
+	// code.
+}
+
+int main(int argc, char *argv[])
+{
+	struct tool_builder builder;
+	tool_builder_init(&builder);
+	tool_builder_add_command(&builder, "Testing", 2, &testing_command_action);
+	// initialize the pre build help command.
+	tool_builder_init_help(&builder, "your-tool-name");
+	// set description.
+	tool_builder_set_desc(&c_builder, "A general description of your tool.");
+	// add testing command to docs.
+	tool_builder_add_command_doc(&builder, "Testing", "Command description");
+	// add aliases to docs.
+	tool_builder_add_alias_doc(&builder, "Testing");
+	
+	tool_builder_destroy(&builder);
+}
+```
+
+
+
+___
+### tool_builder_set_closing_desc
+___
+
+#### Description
+The **tool_builder_set_closing_desc** function sets another description, which appears at the end of the document that appears when the --help command is executed.
+
+#### Function signature
+```C
+int tool_builder_set_closing_desc(struct tool_builder *c_builder, const char *close_description);
+```
+
+#### Arguments
+`c_builder` Is a pointer to the builder to be used.<br>
+`close_description` Something like an epilogue to the reference to a source.
+
+#### Return
+It returns zero when everything went well. In the event of an error, one of the following may be returned.
+
+#### Errors
+`TOOL_BUILDER_FAILED_TO_ADD` Failed to add closing description.
+
+#### Example
+```C
+void testing_command_action(const struct tool_builder_args *info)
+{
+	// code.
+}
+
+int main(int argc, char *argv[])
+{
+	struct tool_builder builder;
+	tool_builder_init(&builder);
+	tool_builder_add_command(&builder, "Testing", 2, &testing_command_action);
+	// initialize the pre build help command.
+	tool_builder_init_help(&c_builder, "your-tool-name");
+	// set description.
+	tool_builder_set_desc(&builder, "A general description of your tool.");
+	// set closing description.
+	tool_builder_set_closing_desc(&builder, "For more informations look at https://example.com");
+	
+	tool_builder_destroy(&builder);
+}
+```
+
+
+
+___
+### tool_builder_add_both
+___
+
+#### Description
+The **tool_builder_add_both** function is a shortcut that executes the **tool_builder_add_command** and **tool_builder_add_command_doc** functions but by calling only one function.
+
+#### Function signature
+```C
+int inline tool_builder_add_both(struct tool_builder *c_builder, const char *c_name,
+                                 int c_argc, void (*c_callback)(const struct tool_builder_args *info),
+                                 const char *c_description)
+
+```
+
+#### Arguments
+`c_builder` Is a pointer to the builder to be used.<br>
+`c_name` The name of the command.<br>
+`c_argc` The number of parameters required by the command.<br>
+`c_callback` The action to be taken if the user requests this command. The function that plays the role of the command action must have the below signature 
+```C
+void your_action(const struct tool_builder_args *info);
+```
+All information about the command inputs is given as a parameter in this action. Check **tool_builder_args** struct for more details.<br>
+`c_description` The description of the command.<br>
+
+#### Return
+It returns zero when everything went well. In the event of an error, one of the following may be returned.
+
+#### Errors
+`TOOL_BUILDER_FAILED_TO_ADD` Failed to add the new command or the description.<br>
+
+#### Example
+```C
+void testing_command_action(const struct tool_builder_args *info)
+{
+	// code.
+}
+
+int main(int argc, char *argv[])
+{
+	struct tool_builder builder;
+	tool_builder_init(&builder);
+	// initialize the pre build help command.
+	tool_builder_init_help(&c_builder, "your-tool-name");
+	// add a command with the description on the docs in one command.
+	tool_builder_add_both(&builder, "Testing", 2, &testing_command_action, "Command description");
+	
+	tool_builder_destroy(&builder);
+}
+```
+
+___
+### tool_builder_add_alias_both
+___
+
+#### Description
+The **tool_builder_add_alias_both** function is a shortcut that executes the **tool_builder_add_alias** and **tool_builder_add_alias_doc** functions but by calling only one function.
+
+#### Function signature
+```C
+int inline tool_builder_add_alias_both(struct tool_builder *c_builder, const char *c_name, 
+                                       const char *c_alias, ...)
+
+```
+
+#### Arguments
+`c_builder` Is a pointer to the builder to be used.<br>
+`c_name` The name of the command to add the aliases.<br>
+`c_alias` The multitude of aliases. The last alias must be NULL.
+
+#### Return
+It returns zero when everything went well. In the event of an error, one of the following may be returned.
+
+
+#### Errors
+`TOOL_BUILDER_NO_SUCH_COMMAND_EXISTS` The command to which it went to add the aliases does not exist.<br>
+`TOOL_BUILDER_FAILED_TO_ADD` Failed to add the aliases.
+
+#### Example
+```C
+void testing_command_action(const struct tool_builder_args *info)
+{
+	// code.
+}
+
+int main(int argc, char *argv[])
+{
+	struct tool_builder builder;
+	tool_builder_init(&builder);
+	// initialize the pre build help command.
+	tool_builder_init_help(&c_builder, "your-tool-name");
+	// add a command with the description on the docs in one command.
+	tool_builder_add_both(&builder, "Testing", 2, &testing_command_action, "Command description");
+	// add aliases in command and on the docs.
+	tool_builder_add_alias_both(&builder, "Testing", "Test", "T", "t", NULL);
+	
+	tool_builder_destroy(&builder);
+}
+```
+
+
+
+
+___
+### tool_builder_set_mc
+___
+
+#### Description
+The tool_builder_set_mc function allows the developer to disable the library function that allows more than one command to execute on the same terminal line.
+
+#### Function signature
+```C
+void inline tool_builder_set_mc(struct tool_builder *c_builder, int state);
+```
+
+#### Arguments
+`c_builder` Is a pointer to the builder to be used.<br>
+`state` The new state. '1' to enable or '0' to disable. By default is '1'.
+
+#### Return
+--
+#### Errors
+--
+#### Example
+```C
+int main(int argc, char *argv[])
+{
+	struct tool_builder builder;
+	tool_builder_init(&builder);
+	tool_builder_set_mc(&builder, 0); // disable feature.
+	
+	tool_builder_destroy(&builder);
+}
+```
 
 ## Example
 An example of the library in use can be found in the **tests** folder
