@@ -407,7 +407,7 @@ int main(int argc, char *argv[])
 	if (tool_builder_prepare(argc, argv, &builder) == TOOL_BUILDER_NO_SUCH_COMMAND_EXISTS)
 	{
 		// call the --help command.
-		tool_builder_call_command("--help", &c_builder);
+		tool_builder_call_command("--help", &builder);
 	}
 	// code.
 	tool_builder_destroy(&builder);
@@ -450,7 +450,7 @@ int main(int argc, char *argv[])
 	tool_builder_init(&builder);
 	tool_builder_add_command(&builder, "Testing", 2, &testing_command_action);
 	// initialize the pre build help command.
-	tool_builder_init_help(&c_builder, "your-tool-name");
+	tool_builder_init_help(&builder, "your-tool-name");
 	
 	tool_builder_destroy(&builder);
 }
@@ -491,9 +491,9 @@ int main(int argc, char *argv[])
 	tool_builder_init(&builder);
 	tool_builder_add_command(&builder, "Testing", 2, &testing_command_action);
 	// initialize the pre build help command.
-	tool_builder_init_help(&c_builder, "your-tool-name");
+	tool_builder_init_help(&builder, "your-tool-name");
 	// set description.
-	tool_builder_set_desc(&c_builder, "A general description of your tool.");
+	tool_builder_set_desc(&builder, "A general description of your tool.");
 	
 	tool_builder_destroy(&builder);
 }
@@ -538,11 +538,11 @@ int main(int argc, char *argv[])
 	tool_builder_init(&builder);
 	tool_builder_add_command(&builder, "Testing", 2, &testing_command_action);
 	// initialize the pre build help command.
-	tool_builder_init_help(&c_builder, "your-tool-name");
+	tool_builder_init_help(&builder, "your-tool-name");
 	// set description.
 	tool_builder_set_desc(&c_builder, "A general description of your tool.");
 	// add testing command to docs.
-	tool_builder_add_command_doc(&c_builder, "Testing", "Command description");
+	tool_builder_add_command_doc(&builder, "Testing", "Command description");
 	
 	tool_builder_destroy(&builder);
 }
@@ -584,13 +584,13 @@ int main(int argc, char *argv[])
 	tool_builder_init(&builder);
 	tool_builder_add_command(&builder, "Testing", 2, &testing_command_action);
 	// initialize the pre build help command.
-	tool_builder_init_help(&c_builder, "your-tool-name");
+	tool_builder_init_help(&builder, "your-tool-name");
 	// set description.
 	tool_builder_set_desc(&c_builder, "A general description of your tool.");
 	// add testing command to docs.
-	tool_builder_add_command_doc(&c_builder, "Testing", "Command description");
+	tool_builder_add_command_doc(&builder, "Testing", "Command description");
 	// add aliases to docs.
-	tool_builder_add_alias_doc(&c_builder, "Testing");
+	tool_builder_add_alias_doc(&builder, "Testing");
 	
 	tool_builder_destroy(&builder);
 }
@@ -603,7 +603,7 @@ ___
 ___
 
 #### Description
-
+The tool_builder_set_closing_desc function sets another description, which appears at the end of the document that appears when the --help command is executed.
 
 #### Function signature
 ```C
@@ -611,14 +611,36 @@ int tool_builder_set_closing_desc(struct tool_builder *c_builder, const char *cl
 ```
 
 #### Arguments
+`c_builder` Is a pointer to the builder to be used.<br>
+`close_description` Something like an epilogue to the reference to a source.
 
 #### Return
+It returns zero when everything went well. In the event of an error, one of the following may be returned.
 
 #### Errors
+`TOOL_BUILDER_FAILED_TO_ADD` Failed to add closing description.
 
 #### Example
 ```C
+void testing_command_action(const struct tool_builder_args *info)
+{
+	// code.
+}
 
+int main(int argc, char *argv[])
+{
+	struct tool_builder builder;
+	tool_builder_init(&builder);
+	tool_builder_add_command(&builder, "Testing", 2, &testing_command_action);
+	// initialize the pre build help command.
+	tool_builder_init_help(&c_builder, "your-tool-name");
+	// set description.
+	tool_builder_set_desc(&builder, "A general description of your tool.");
+	// set closing description.
+	tool_builder_set_closing_desc(&builder, "For more informations look at https://example.com");
+	
+	tool_builder_destroy(&builder);
+}
 ```
 
 
