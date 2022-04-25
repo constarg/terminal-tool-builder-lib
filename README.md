@@ -374,7 +374,7 @@ ___
 ___
 
 #### Description
-The **tool_builder_call_command** function allows the tool developer to execute a tool command without the user requesting it from the terminal.
+The **tool_builder_call_command** function allows the tool developer to execute a tool command without the user requesting it from the terminal. The command requested by the programmer should have no parameters.
 
 #### Function signature
 ```C
