@@ -763,7 +763,7 @@ void inline tool_builder_set_mc(struct tool_builder *c_builder, int state);
 
 #### Arguments
 `c_builder` Is a pointer to the builder to be used.<br>
-`state` The new state. '1' to enable or '0' to disable.
+`state` The new state. '1' to enable or '0' to disable. By default is '1'.
 
 #### Return
 --
@@ -775,7 +775,7 @@ int main(int argc, char *argv[])
 {
 	struct tool_builder builder;
 	tool_builder_init(&builder);
-	
+	tool_builder_set_mc(&builder, 0); // disable feature.
 	
 	tool_builder_destroy(&builder);
 }
