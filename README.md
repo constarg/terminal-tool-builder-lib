@@ -420,7 +420,7 @@ ___
 ___
 
 #### Description
-The tool_builder_init_help function generates a --help command along with the -h aliases and adds it to the tool with a default action. This action can be changed if you do not please the developer.
+The **tool_builder_init_help** function generates a --help command along with the -h aliases and adds it to the tool with a default action. This action can be changed if you do not please the developer.
 
 #### Function signature
 ```C
@@ -505,7 +505,7 @@ ___
 ___
 
 #### Description
-
+The **tool_builder_add_command_doc** function adds the name of a command, along with its accompanying description to the tool instructions. These instructions can be displayed using the --help command.
 
 #### Function signature
 ```C
@@ -515,14 +515,37 @@ int tool_builder_add_command_doc(struct tool_builder *c_builder, const char *c_n
 ```
 
 #### Arguments
+`c_builder` Is a pointer to the builder to be used.<br>
+`c_name` The name of the command to add.<br>
+`c_description` The description of the command.<br>
 
 #### Return
+It returns zero when everything went well. In the event of an error, one of the following may be returned.
 
 #### Errors
+`TOOL_BUILDER_FAILED_TO_ADD` Failed to add the command or description.
 
 #### Example
 ```C
+void testing_command_action(const struct tool_builder_args *info)
+{
+	// code.
+}
 
+int main(int argc, char *argv[])
+{
+	struct tool_builder builder;
+	tool_builder_init(&builder);
+	tool_builder_add_command(&builder, "Testing", 2, &testing_command_action);
+	// initialize the pre build help command.
+	tool_builder_init_help(&c_builder, "your-tool-name");
+	// set description.
+	tool_builder_set_desc(&c_builder, "A general description of your tool.");
+	// add testing command to docs.
+	tool_builder_add_command_doc(&c_builder, "Testing", "Command description");
+	
+	tool_builder_destroy(&builder);
+}
 ```
 
 
