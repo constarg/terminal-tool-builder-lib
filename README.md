@@ -421,7 +421,7 @@ ___
 ___
 
 #### Description
-
+The tool_builder_init_help function generates a --help command along with the -h aliases and adds it to the tool with a default action. This action can be changed if you do not please the developer.
 
 #### Function signature
 ```C
@@ -429,14 +429,31 @@ int tool_builder_init_help(struct tool_builder *c_builder, const char *tool_name
 ```
 
 #### Arguments
+`c_builder` Is a pointer to the builder to be used.<br>
+`tool_name` The name of the tool.
 
 #### Return
 
 #### Errors
+`TOOL_BUILDER_FAILED_TO_ADD` Failed to add the new command or alias.
 
 #### Example
 ```C
+void testing_command_action(const struct tool_builder_args *info)
+{
+	// code.
+}
 
+int main(int argc, char *argv[])
+{
+	struct tool_builder builder;
+	tool_builder_init(&builder);
+	tool_builder_add_command(&builder, "Testing", 2, &testing_command_action);
+	// initialize the pre build help command.
+	tool_builder_init_help(&c_builder, "your-tool-name");
+	
+	tool_builder_destroy(&builder);
+}
 ```
 
 
