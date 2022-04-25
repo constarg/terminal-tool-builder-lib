@@ -383,7 +383,7 @@ int tool_builder_call_command(const char *c_name, const struct tool_builder *c_b
 
 #### Arguments
 `c_name` The name of the command to be executed.<br>
-`c_builder` The builder who has the information for this command.
+`c_builder` Is a pointer to the builder to be used.
 
 #### Return
 It returns zero when everything went well. In the event of an error, one of the following may be returned.
