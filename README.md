@@ -517,7 +517,7 @@ int tool_builder_add_command_doc(struct tool_builder *c_builder, const char *c_n
 #### Arguments
 `c_builder` Is a pointer to the builder to be used.<br>
 `c_name` The name of the command to add.<br>
-`c_description` The description of the command.<br>
+`c_description` The description of the command.
 
 #### Return
 It returns zero when everything went well. In the event of an error, one of the following may be returned.
@@ -603,7 +603,7 @@ ___
 ___
 
 #### Description
-The tool_builder_set_closing_desc function sets another description, which appears at the end of the document that appears when the --help command is executed.
+The **tool_builder_set_closing_desc** function sets another description, which appears at the end of the document that appears when the --help command is executed.
 
 #### Function signature
 ```C
@@ -650,7 +650,7 @@ ___
 ___
 
 #### Description
-
+The **tool_builder_add_both** function is a shortcut that executes the **tool_builder_add_command** and **tool_builder_add_command_doc** functions but by calling only one function.
 
 #### Function signature
 ```C
@@ -661,14 +661,40 @@ int inline tool_builder_add_both(struct tool_builder *c_builder, const char *c_n
 ```
 
 #### Arguments
+`c_builder` Is a pointer to the builder to be used.<br>
+`c_name` The name of the command.<br>
+`c_argc` The number of parameters required by the command.<br>
+`c_callback` The action to be taken if the user requests this command. The function that plays the role of the command action must have the below signature 
+```C
+void your_action(const struct tool_builder_args *info);
+```
+All information about the command inputs is given as a parameter in this action. Check **tool_builder_args** struct for more details.<br>
+`c_description` The description of the command.<br>
 
 #### Return
+It returns zero when everything went well. In the event of an error, one of the following may be returned.
 
 #### Errors
+`TOOL_BUILDER_FAILED_TO_ADD` Failed to add the new command or the description.<br>
 
 #### Example
 ```C
+void testing_command_action(const struct tool_builder_args *info)
+{
+	// code.
+}
 
+int main(int argc, char *argv[])
+{
+	struct tool_builder builder;
+	tool_builder_init(&builder);
+	// initialize the pre build help command.
+	tool_builder_init_help(&c_builder, "your-tool-name");
+	// add a command with the description on the docs in one command.
+	tool_builder_add_both(&builder, "Testing", 2, &testing_command_action, "Command description");
+	
+	tool_builder_destroy(&builder);
+}
 ```
 
 ___
@@ -676,7 +702,7 @@ ___
 ___
 
 #### Description
-
+The **tool_builder_add_alias_both** function is a shortcut that executes the **tool_builder_add_alias** and **tool_builder_add_alias_doc** functions but by calling only one function.
 
 #### Function signature
 ```C
@@ -686,17 +712,39 @@ int inline tool_builder_add_alias_both(struct tool_builder *c_builder, const cha
 ```
 
 #### Arguments
+`c_builder` Is a pointer to the builder to be used.<br>
+`c_name` The name of the command to add the aliases.<br>
+`c_alias` The multitude of aliases. The last alias must be NULL.
 
 #### Return
+It returns zero when everything went well. In the event of an error, one of the following may be returned.
+
 
 #### Errors
+`TOOL_BUILDER_NO_SUCH_COMMAND_EXISTS` The command to which it went to add the aliases does not exist.<br>
+`TOOL_BUILDER_FAILED_TO_ADD` Failed to add the aliases.
 
 #### Example
 ```C
+void testing_command_action(const struct tool_builder_args *info)
+{
+	// code.
+}
 
+int main(int argc, char *argv[])
+{
+	struct tool_builder builder;
+	tool_builder_init(&builder);
+	// initialize the pre build help command.
+	tool_builder_init_help(&c_builder, "your-tool-name");
+	// add a command with the description on the docs in one command.
+	tool_builder_add_both(&builder, "Testing", 2, &testing_command_action, "Command description");
+	// add aliases in command and on the docs.
+	tool_builder_add_alias_both(&builder, "Testing", "Test", "T", "t", NULL);
+	
+	tool_builder_destroy(&builder);
+}
 ```
-
-
 
 ## Example
 An example of the library in use can be found in the **tests** folder
