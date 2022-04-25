@@ -191,6 +191,7 @@ int tool_builder_add_command(struct tool_builder *c_builder, const char *c_name,
 	struct tool_builder_command new_command;
         memset(&new_command, 0x0, sizeof(struct tool_builder_command));
 	new_command.c_name = (char *) malloc(sizeof(char) * (strlen(c_name) + 1));
+	if (new_command.c_name == NULL) return TOOL_BUILDER_FAILED_TO_ADD;
 
 	strcpy(new_command.c_name, c_name);
 	new_command.c_argc = c_argc;
@@ -198,6 +199,8 @@ int tool_builder_add_command(struct tool_builder *c_builder, const char *c_name,
 	new_command.c_callback = c_callback;
 	c_builder->t_commands = (struct tool_builder_command *) realloc(c_builder->t_commands,
                                                                    sizeof(struct tool_builder_command) * (last_c + 1));
+	if (c_builder->t_commands == NULL) return TOOL_BUILDER_FAILED_TO_ADD;
+
 	c_builder->t_commands[last_c] = new_command;
 	c_builder->t_commandsc += 1;
 	return 0;
@@ -210,7 +213,7 @@ int tool_builder_add_alias(struct tool_builder *c_builder, const char *c_name,
                                                             c_name, c_builder->t_commandsc);
 
 	if (command == NULL) return TOOL_BUILDER_NO_SUCH_COMMAND_EXISTS;
-	if (c_alias == NULL) return -1;
+	if (c_alias == NULL) return TOOL_BUILDER_FAILED_TO_ADD;
 
 	command->c_alias = (char **) calloc(1, sizeof(char *));
 	command->c_alias_c = 0; // initialize count.	
@@ -229,6 +232,7 @@ int tool_builder_add_alias(struct tool_builder *c_builder, const char *c_name,
 		strcpy(command->c_alias[command->c_alias_c], tmp_a);
 		// increase the aliases.
 		command->c_alias = (char **) realloc(command->c_alias,(++command->c_alias_c + 1) * sizeof(char *));
+		if (command->c_alias == NULL) return TOOL_BUILDER_FAILED_TO_ADD;
 		tmp_a = va_arg(alias_list, char*);
 	}
 
@@ -281,11 +285,11 @@ int tool_builder_call_command(const char *c_name, const struct tool_builder *c_b
 
     	struct tool_builder_args exec_inf;
     	memset(&exec_inf, 0x0, sizeof(struct tool_builder_args));
-    	exec_inf.c_name = command->c_name;
+    	exec_inf.c_name       = command->c_name;
    	exec_inf.c_used_alias = command->c_name;
-   	exec_inf.c_argc = command->c_argc;
-    	exec_inf.c_values = NULL;	// This points to the first argument of the requested command.
-    	exec_inf.c_builder = (struct tool_builder *) c_builder;
+   	exec_inf.c_argc       = command->c_argc;
+    	exec_inf.c_values     = NULL;	// This points to the first argument of the requested command.
+    	exec_inf.c_builder    = (struct tool_builder *) c_builder;
    	// call the command.
     	command->c_callback(&exec_inf);
    	return 0;
@@ -312,13 +316,14 @@ int tool_builder_prepare(int argc, char *argv[], const struct tool_builder *c_bu
 		if (c_curr == NULL) return TOOL_BUILDER_NO_SUCH_COMMAND_EXISTS;
 		if (c_curr->c_callback == NULL) return TOOL_BUILDER_NO_ACTION_DEFINED;
 
-		c_data.c_args.c_name = c_curr->c_name;
+		c_data.c_args.c_name 	   = c_curr->c_name;
 		c_data.c_args.c_used_alias = *command;
-		c_data.c_args.c_argc = c_curr->c_argc;
-		c_data.c_args.c_values = (char **) malloc(sizeof(char *) * (c_curr->c_argc + 1));
-		c_data.c_args.c_builder = (struct tool_builder *) c_builder;
-		c_data.c_callback = c_curr->c_callback;
+		c_data.c_args.c_argc 	   = c_curr->c_argc;
+		c_data.c_args.c_values 	   = (char **) malloc(sizeof(char *) * (c_curr->c_argc + 1));
+		c_data.c_args.c_builder    = (struct tool_builder *) c_builder;
+		c_data.c_callback 	   = c_curr->c_callback;
 
+		if (c_data.c_args.c_values == NULL) return TOOL_BUILDER_FAILED_TO_ADD; 
 		// store the values.
 		for (int v = 0; v < c_curr->c_argc; v++)
 		{
