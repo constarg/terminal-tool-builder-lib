@@ -332,7 +332,7 @@ ___
 ___
 
 #### Description
-
+The **tool_builder_execute** function is responsible for executing any command requested by the terminal in the executable. If more than one command is given, it will be executed in the order given, from left to right.
 
 #### Function signature
 ```C
@@ -340,14 +340,33 @@ void tool_builder_execute();
 ```
 
 #### Arguments
+--
 
 #### Return
+--
 
 #### Errors
+--
 
 #### Example
 ```C
+void testing_command_action(const struct tool_builder_args *info)
+{
+	// code.
+}
 
+int main(int argc, char *argv[])
+{
+	struct tool_builder builder;
+	tool_builder_init(&builder);
+	tool_builder_add_command(&builder, "Testing", 2, &testing_command_action);
+	// prepare for execution.
+	tool_builder_prepare(argc, argv, &builder);
+	// exete the commands.
+	tool_builder_execute();
+	// code.
+	tool_builder_destroy(&builder);
+}
 ```
 
 
@@ -356,7 +375,7 @@ ___
 ___
 
 #### Description
-
+The **tool_builder_call_command** function allows the tool developer to execute a tool command without the user requesting it from the terminal.
 
 #### Function signature
 ```C
@@ -364,14 +383,36 @@ int tool_builder_call_command(const char *c_name, const struct tool_builder *c_b
 ```
 
 #### Arguments
+`c_name` The name of the command to be executed.<br>
+`c_builder` The builder who has the information for this command.
 
 #### Return
+It returns zero when everything went well. In the event of an error, one of the following may be returned.
 
 #### Errors
-
+`TOOL_BUILDER_WRONG_NAME_OR_ALIAS` There is no command with this name.
 #### Example
 ```C
+void testing_command_action(const struct tool_builder_args *info)
+{
+	// code.
+}
 
+int main(int argc, char *argv[])
+{
+	struct tool_builder builder;
+	tool_builder_init(&builder);
+	tool_builder_add_command(&builder, "Testing", 2, &testing_command_action);
+	tool_builder_init_help(&c_builder, "your-tool-name");
+	// prepare for execution.
+	if (tool_builder_prepare(argc, argv, &builder) == TOOL_BUILDER_NO_SUCH_COMMAND_EXISTS)
+	{
+		// call the --help command.
+		tool_builder_call_command("--help", &c_builder);
+	}
+	// code.
+	tool_builder_destroy(&builder);
+}
 ```
 
 
