@@ -569,10 +569,31 @@ int tool_builder_add_alias_doc(struct tool_builder *c_builder, const char *c_nam
 It returns zero when everything went well. In the event of an error, one of the following may be returned.
 
 #### Errors
+`TOOL_BUILDER_NO_SUCH_COMMAND_EXISTS` The command does not exists.
 
 #### Example
 ```C
+void testing_command_action(const struct tool_builder_args *info)
+{
+	// code.
+}
 
+int main(int argc, char *argv[])
+{
+	struct tool_builder builder;
+	tool_builder_init(&builder);
+	tool_builder_add_command(&builder, "Testing", 2, &testing_command_action);
+	// initialize the pre build help command.
+	tool_builder_init_help(&c_builder, "your-tool-name");
+	// set description.
+	tool_builder_set_desc(&c_builder, "A general description of your tool.");
+	// add testing command to docs.
+	tool_builder_add_command_doc(&c_builder, "Testing", "Command description");
+	// add aliases to docs.
+	tool_builder_add_alias_doc(&c_builder, "Testing");
+	
+	tool_builder_destroy(&builder);
+}
 ```
 
 
