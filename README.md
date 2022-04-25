@@ -58,7 +58,7 @@ This library is designed to make it easy to create tools that run on the termina
 
 ```
 
-## Library Stractures
+## Library Structures
 
 ### tool_builder
 The builder structure is the most basic element of the library. It contains all the necessary information for the construction of the requested tool.
@@ -76,7 +76,7 @@ struct tool_builder
 
 ### tool_builder_args
 The parameter structure is the structure that is "sent" to the user function that executes a command. It is used so that the user (**tool developer**) receives the necessary information about the command that was executed.
-#### Stracture definition
+#### Structure definition
 ```C
 struct tool_builder_args 
 {
@@ -554,7 +554,7 @@ ___
 ___
 
 #### Description
-
+The **tool_builder_add_command_doc** function adds the aliases of a command to the tool instructions. These instructions can be displayed using the --help command. The aliases do not need to be given again because they already exist in the builder. They are in the command structure.
 
 #### Function signature
 ```C
@@ -562,8 +562,11 @@ int tool_builder_add_alias_doc(struct tool_builder *c_builder, const char *c_nam
 ```
 
 #### Arguments
+`c_builder` Is a pointer to the builder to be used.<br>
+`c_name` The name of the command that has these aliases.
 
 #### Return
+It returns zero when everything went well. In the event of an error, one of the following may be returned.
 
 #### Errors
 
