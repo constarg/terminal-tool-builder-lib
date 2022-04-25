@@ -746,6 +746,41 @@ int main(int argc, char *argv[])
 }
 ```
 
+
+
+
+___
+### tool_builder_set_mc
+___
+
+#### Description
+The tool_builder_set_mc function allows the developer to disable the library function that allows more than one command to execute on the same terminal line.
+
+#### Function signature
+```C
+void inline tool_builder_set_mc(struct tool_builder *c_builder, int state);
+```
+
+#### Arguments
+`c_builder` Is a pointer to the builder to be used.<br>
+`state` The new state. '1' to enable or '0' to disable.
+
+#### Return
+--
+#### Errors
+--
+#### Example
+```C
+int main(int argc, char *argv[])
+{
+	struct tool_builder builder;
+	tool_builder_init(&builder);
+	
+	
+	tool_builder_destroy(&builder);
+}
+```
+
 ## Example
 An example of the library in use can be found in the **tests** folder
 
