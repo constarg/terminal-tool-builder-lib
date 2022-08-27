@@ -43,7 +43,7 @@ int main(int argc, char *argv[]) {
   	tool_builder_set_closing_desc(&builder, "hello");	
 	
 	// Add a new command to the docs of help.
-        tool_builder_add_command_doc(&builder, "Testing", "This command is a test command");
+    tool_builder_add_command_doc(&builder, "Testing", "This command is a test command");
 
 	tool_builder_add_command(
 		&builder,

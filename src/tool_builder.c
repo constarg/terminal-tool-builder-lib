@@ -9,13 +9,13 @@ struct tool_builder_c_help
 {
 	char *c_name;							// The name of the command.
 	char *(*c_alias);						// The alias of the command.
-	char *c_description;						// The description of the command.
+	char *c_description;					// The description of the command.
 };
 
 struct tool_builder_command 
 {
 	char *c_name;							// The name of the command.
-	int c_argc;							// How many argcs the command require.
+	int c_argc;							    // How many argcs the command require.
 	char *(*c_alias);						// The alias of the commnad. 5 is the maximum number of alias.
 	int c_alias_c;
 	/**
@@ -45,7 +45,7 @@ static void help_defualt_action(const struct tool_builder_args *info)
 	
 	if (builder->t_help.t_description == NULL) goto skip_dec;
 	printf("%s\n\n\n", builder->t_help.t_description);
-    	struct tool_builder_c_help *commands_h;
+    struct tool_builder_c_help *commands_h;
 skip_dec:
    	commands_h = builder->t_help.t_commands;
 	for (int h = 0; h < builder->t_help.t_commandsc; h++)
@@ -64,7 +64,7 @@ skip_alias:
 
 void tool_builder_init(struct tool_builder *c_builder)
 {
-        memset(c_builder, 0x0, sizeof(struct tool_builder));
+    memset(c_builder, 0x0, sizeof(struct tool_builder));
 	c_builder->t_commands = (struct tool_builder_command *) calloc(1, sizeof(struct tool_builder_command));
 	c_builder->t_commandsc = 0x0;
 	c_builder->t_mc = 0x1;
@@ -72,11 +72,11 @@ void tool_builder_init(struct tool_builder *c_builder)
 
 void tool_builder_destroy(struct tool_builder *c_builder)
 {
-        for (int h = 0; h < c_builder->t_help.t_commandsc; h++)
-        {
-            free(c_builder->t_help.t_commands[h].c_name);
-            free(c_builder->t_help.t_commands[h].c_description);
-        }
+    for (int h = 0; h < c_builder->t_help.t_commandsc; h++)
+    {
+        free(c_builder->t_help.t_commands[h].c_name);
+        free(c_builder->t_help.t_commands[h].c_description);
+    }
 	// Free help.
 	free(c_builder->t_help.t_commands);
 	free(c_builder->t_help.t_usage_sec);
@@ -148,7 +148,7 @@ int tool_builder_add_command_doc(struct tool_builder *c_builder, const char *c_n
 
 	int last_c = c_builder->t_help.t_commandsc;
 	c_builder->t_help.t_commands = (struct tool_builder_c_help *) realloc(c_builder->t_help.t_commands,
-                               sizeof(struct tool_builder_c_help) * (last_c + 1));
+                                    sizeof(struct tool_builder_c_help) * (last_c + 1));
 	if (c_builder->t_help.t_commands == NULL)
 		return TOOL_BUILDER_FAILED_TO_ADD;
 
@@ -162,7 +162,7 @@ int tool_builder_add_command_doc(struct tool_builder *c_builder, const char *c_n
 int tool_builder_add_alias_doc(struct tool_builder *c_builder, const char *c_name)
 {
 	struct tool_builder_command *c_found = find_command((const struct tool_builder_command *) c_builder->t_commands,
-                                                            c_name, c_builder->t_commandsc);
+                                                        c_name, c_builder->t_commandsc);
 	if (c_found == NULL) return TOOL_BUILDER_NO_SUCH_COMMAND_EXISTS;
 
 	for (int h = 0; h < c_builder->t_help.t_commandsc; h++)
@@ -189,7 +189,7 @@ int tool_builder_add_command(struct tool_builder *c_builder, const char *c_name,
 	// Allocate memory for the new command.
 	int last_c = c_builder->t_commandsc;
 	struct tool_builder_command new_command;
-        memset(&new_command, 0x0, sizeof(struct tool_builder_command));
+    memset(&new_command, 0x0, sizeof(struct tool_builder_command));
 	new_command.c_name = (char *) malloc(sizeof(char) * (strlen(c_name) + 1));
 	if (new_command.c_name == NULL) return TOOL_BUILDER_FAILED_TO_ADD;
 
@@ -198,7 +198,7 @@ int tool_builder_add_command(struct tool_builder *c_builder, const char *c_name,
 	
 	new_command.c_callback = c_callback;
 	c_builder->t_commands = (struct tool_builder_command *) realloc(c_builder->t_commands,
-                                                                   sizeof(struct tool_builder_command) * (last_c + 1));
+                                                                    sizeof(struct tool_builder_command) * (last_c + 1));
 	if (c_builder->t_commands == NULL) return TOOL_BUILDER_FAILED_TO_ADD;
 
 	c_builder->t_commands[last_c] = new_command;
@@ -210,7 +210,7 @@ int tool_builder_add_alias(struct tool_builder *c_builder, const char *c_name,
                            const char *c_alias, ...)
 {
 	struct tool_builder_command *command = find_command((const struct tool_builder_command *) c_builder->t_commands,
-                                                            c_name, c_builder->t_commandsc);
+                                                        c_name, c_builder->t_commandsc);
 
 	if (command == NULL) return TOOL_BUILDER_NO_SUCH_COMMAND_EXISTS;
 	if (c_alias == NULL) return TOOL_BUILDER_FAILED_TO_ADD;
@@ -248,7 +248,7 @@ int tool_builder_set_action(struct tool_builder *c_builder, const char *c_name,
                             void (*c_callback)(const struct tool_builder_args *info))
 {
 	struct tool_builder_command *ch_command = find_command((const struct tool_builder_command *) c_builder->t_commands, c_name,
-                                               c_builder->t_commandsc);
+                                                            c_builder->t_commandsc);
 	if (ch_command == NULL) return TOOL_BUILDER_NO_SUCH_COMMAND_EXISTS;
 	ch_command->c_callback = c_callback;	// Set the requested callback.
 	return 0;
@@ -270,7 +270,7 @@ static inline struct tool_builder_command *find_command(const struct tool_builde
 			for (int curr_a = 0; commands[curr_c].c_alias[curr_a]; curr_a++)
 		 	{
 				if (!strcmp(commands[curr_c].c_alias[curr_a], c_name)) return (struct tool_builder_command *)
-                                                                                                &commands[curr_c];
+                                                                               &commands[curr_c];
 			}
 		}
 	}
@@ -283,21 +283,21 @@ int tool_builder_call_command(const char *c_name, const struct tool_builder *c_b
                                                         c_name, c_builder->t_commandsc);
    	if (command == NULL) return TOOL_BUILDER_WRONG_NAME_OR_ALIAS;
 
-    	struct tool_builder_args exec_inf;
-    	memset(&exec_inf, 0x0, sizeof(struct tool_builder_args));
-    	exec_inf.c_name       = command->c_name;
+    struct tool_builder_args exec_inf;
+    memset(&exec_inf, 0x0, sizeof(struct tool_builder_args));
+    exec_inf.c_name       = command->c_name;
    	exec_inf.c_used_alias = command->c_name;
    	exec_inf.c_argc       = command->c_argc;
-    	exec_inf.c_values     = NULL;	// This points to the first argument of the requested command.
-    	exec_inf.c_builder    = (struct tool_builder *) c_builder;
+    exec_inf.c_values     = NULL;	// This points to the first argument of the requested command.
+    exec_inf.c_builder    = (struct tool_builder *) c_builder;
    	// call the command.
-    	command->c_callback(&exec_inf);
+    command->c_callback(&exec_inf);
    	return 0;
 }
 
 int tool_builder_prepare(int argc, char *argv[], const struct tool_builder *c_builder)
 {
-
+    if (argv[0] == NULL) return TOOL_BUILDER_EMPTY_NAME;
 	if (argv[1] == NULL) return TOOL_BUILDER_EMPTY_NAME;
 
 	tb_queue_init(&c_queue);
@@ -321,17 +321,18 @@ int tool_builder_prepare(int argc, char *argv[], const struct tool_builder *c_bu
 		c_data.c_args.c_argc 	   = c_curr->c_argc;
 		c_data.c_args.c_values 	   = (char **) malloc(sizeof(char *) * (c_curr->c_argc + 1));
 		c_data.c_args.c_builder    = (struct tool_builder *) c_builder;
-		c_data.c_callback 	   = c_curr->c_callback;
+		c_data.c_callback 	       = c_curr->c_callback;
 
 		if (c_data.c_args.c_values == NULL) return TOOL_BUILDER_FAILED_TO_ADD; 
 		// store the values.
 		for (int v = 0; v < c_curr->c_argc; v++)
 		{
 			c_data.c_args.c_values[v] = ( *(command + v + 1) == NULL )? NULL : *(command + v + 1);
-			if (	c_data.c_args.c_values[v] == NULL  
+			if (	
+				c_data.c_args.c_values[v] == NULL  
 				||
 			   	find_command((const struct tool_builder_command *) c_builder->t_commands, *(command + v + 1),
-                                      	     c_builder->t_commandsc) != NULL
+                             c_builder->t_commandsc) != NULL
 			   )
 			{
 				free(c_data.c_args.c_values);

@@ -15,7 +15,7 @@ void tb_queue_enqueue(struct tb_queue_node_d *src, struct tb_queue *queue)
 	}
 
 	struct tb_queue_node *new_node = (struct tb_queue_node *) 
-					  malloc(sizeof(struct tb_queue_node));
+					                  malloc(sizeof(struct tb_queue_node));
 	memcpy(&new_node->data, src, sizeof(struct tb_queue_node_d));
 	new_node->next = NULL;
 
