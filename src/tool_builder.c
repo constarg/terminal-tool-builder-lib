@@ -38,36 +38,36 @@ static struct tb_queue c_queue;
 
 static void help_defualt_action(const struct tool_builder_args *info)
 {
-	// Prints the help message.
-	struct tool_builder *builder = info->c_builder;
-	if (builder == NULL) return;
-	printf("%s\n", builder->t_help.t_usage_sec);
+    // Prints the help message.
+    struct tool_builder *builder = info->c_builder;
+    if (builder == NULL) return;
+    printf("%s\n", builder->t_help.t_usage_sec);
 	
-	if (builder->t_help.t_description == NULL) goto skip_dec;
-	printf("%s\n\n\n", builder->t_help.t_description);
+    if (builder->t_help.t_description == NULL) goto skip_dec;
+    printf("%s\n\n\n", builder->t_help.t_description);
     struct tool_builder_c_help *commands_h;
 skip_dec:
-   	commands_h = builder->t_help.t_commands;
-	for (int h = 0; h < builder->t_help.t_commandsc; h++)
-	{
-		printf("\t%s", commands_h[h].c_name);
+    commands_h = builder->t_help.t_commands;
+    for (int h = 0; h < builder->t_help.t_commandsc; h++)
+    {
+        printf("\t%s", commands_h[h].c_name);
         if (commands_h[h].c_alias == NULL) goto skip_alias;
-		for (int c_a = 0; commands_h[h].c_alias[c_a]; c_a++)
-			printf(" ,%s,", commands_h[h].c_alias[c_a]);
+        for (int c_a = 0; commands_h[h].c_alias[c_a]; c_a++)
+            printf(" ,%s,", commands_h[h].c_alias[c_a]);
 skip_alias:
-		printf("%s\n", commands_h[h].c_description);
-	}
+        printf("%s\n", commands_h[h].c_description);
+    }
 
-	if (builder->t_help.t_close_description == NULL) return;
-	printf("%s\n", builder->t_help.t_close_description);
+    if (builder->t_help.t_close_description == NULL) return;
+    printf("%s\n", builder->t_help.t_close_description);
 }
 
 void tool_builder_init(struct tool_builder *c_builder)
 {
     memset(c_builder, 0x0, sizeof(struct tool_builder));
-	c_builder->t_commands = (struct tool_builder_command *) calloc(1, sizeof(struct tool_builder_command));
-	c_builder->t_commandsc = 0x0;
-	c_builder->t_mc = 0x1;
+    c_builder->t_commands = (struct tool_builder_command *) calloc(1, sizeof(struct tool_builder_command));
+    c_builder->t_commandsc = 0x0;
+    c_builder->t_mc = 0x1;
 }
 
 void tool_builder_destroy(struct tool_builder *c_builder)
@@ -77,49 +77,49 @@ void tool_builder_destroy(struct tool_builder *c_builder)
         free(c_builder->t_help.t_commands[h].c_name);
         free(c_builder->t_help.t_commands[h].c_description);
     }
-	// Free help.
-	free(c_builder->t_help.t_commands);
-	free(c_builder->t_help.t_usage_sec);
-	free(c_builder->t_help.t_close_description);
-	free(c_builder->t_help.t_description);
+    // Free help.
+    free(c_builder->t_help.t_commands);
+    free(c_builder->t_help.t_usage_sec);
+    free(c_builder->t_help.t_close_description);
+    free(c_builder->t_help.t_description);
 
-	// Free the memory for the commands.
-	for (int c = 0; c < c_builder->t_commandsc; c++)
-	{
-		free(c_builder->t_commands[c].c_name);
-		for (int a = 0; a < c_builder->t_commands[c].c_alias_c; a++)
-			free(c_builder->t_commands[c].c_alias[a]);
-		free(c_builder->t_commands[c].c_alias);
+    // Free the memory for the commands.
+    for (int c = 0; c < c_builder->t_commandsc; c++)
+    {
+        free(c_builder->t_commands[c].c_name);
+        for (int a = 0; a < c_builder->t_commands[c].c_alias_c; a++)
+            free(c_builder->t_commands[c].c_alias[a]);
+        free(c_builder->t_commands[c].c_alias);
 	}
-	free(c_builder->t_commands);
+    free(c_builder->t_commands);
 }	
 
 
 int tool_builder_init_help(struct tool_builder *c_builder, const char *tool_name)
 {
-	const char *str_u_1 = "Usage:";
-	const char *str_u_2 = "[OPTION]...";
+    const char *str_u_1 = "Usage:";
+    const char *str_u_2 = "[OPTION]...";
 	
-	size_t usage_size = strlen(tool_name) + strlen(str_u_1)
-                                    + strlen(str_u_2) + 3;
+    size_t usage_size = strlen(tool_name) + strlen(str_u_1)
+                                + strlen(str_u_2) + 3;
  
-	char *(*usage_sec) = &c_builder->t_help.t_usage_sec;
-	*usage_sec = malloc(sizeof(char) * usage_size);
-	if ((*usage_sec) == NULL) return TOOL_BUILDER_FAILED_TO_ADD;
+    char *(*usage_sec) = &c_builder->t_help.t_usage_sec;
+    *usage_sec = malloc(sizeof(char) * usage_size);
+    if ((*usage_sec) == NULL) return TOOL_BUILDER_FAILED_TO_ADD;
 	
-	sprintf((*usage_sec),"%s %s %s", str_u_1, tool_name, str_u_2);
+    sprintf((*usage_sec),"%s %s %s", str_u_1, tool_name, str_u_2);
 	
-	// Initialize help as a command.
-	// Add command.
-	int error = tool_builder_add_command(
-		c_builder,
-		"--help",
-		0,
-		&help_defualt_action
-	); 
-	if (error != 0) return error;
+    // Initialize help as a command.
+    // Add command.
+    int error = tool_builder_add_command(
+        c_builder,
+        "--help",
+        0,
+        &help_defualt_action
+    ); 
+    if (error != 0) return error;
 
-	return tool_builder_add_alias(c_builder, "--help","-h", NULL);
+    return tool_builder_add_alias(c_builder, "--help","-h", NULL);
 }
 
 int tool_builder_set_desc(struct tool_builder *c_builder, const char *c_description)
