@@ -4,7 +4,7 @@
 #include <malloc.h>
 #include <string.h>
 
-#define TOOL_BUILDER_V 				 									 1.6
+#define TOOL_BUILDER_V                           1.6
 
 // errors
 #define TOOL_BUILDER_WRONG_ARG_NUM              -1
@@ -19,16 +19,16 @@
 
 
 
-struct tool_builder_c_help; 											// command help
+struct tool_builder_c_help;                         // command help
 struct tool_builder_command;
 
 struct tool_builder_help
 {
-        char *t_usage_sec;												// The useage section. example: Usage: tool_name [OPTION]...
-        char *t_description;											// The description of the help.
-        struct tool_builder_c_help *t_commands;		// The commands of the help.
-        char *t_close_description;								// The closure description.
-        int t_commandsc;													// The number of commands in help.
+        char *t_usage_sec;                          // The useage section. example: Usage: tool_name [OPTION]...
+        char *t_description;                        // The description of the help.
+        struct tool_builder_c_help *t_commands;     // The commands of the help.
+        char *t_close_description;                  // The closure description.
+        int t_commandsc;                            // The number of commands in help.
 };
 
 
@@ -39,10 +39,10 @@ struct tool_builder_help
 */
 struct tool_builder 
 {
-	struct tool_builder_command *t_commands;		// array of commands.
-	int t_commandsc;														// The number of the commands.
-	struct tool_builder_help t_help;						// The help of the tool.
-	int t_mc: 1;																// enable or disable multiple commands in one line.
+	struct tool_builder_command *t_commands;        // array of commands.
+	int t_commandsc;                                // The number of the commands.
+	struct tool_builder_help t_help;                // The help of the tool.
+	int t_mc: 1;                                    // enable or disable multiple commands in one line.
 };
 
 /**
@@ -53,11 +53,11 @@ struct tool_builder
 */
 struct tool_builder_args 
 {
-	char *c_name;																// The name of the command that has been executed.
-	char *c_used_alias;													// The alias that has been used.
-	char *(*c_values);													// The values that the been retrieved. Must be freed when there is no more use.
-	int c_argc;																	// The arguments of the command.
-	struct tool_builder *c_builder;							// The builder.
+	char *c_name;                                   // The name of the command that has been executed.
+	char *c_used_alias;                             // The alias that has been used.
+	char *(*c_values);                              // The values that the been retrieved. Must be freed when there is no more use.
+	int c_argc;                                     // The arguments of the command.
+	struct tool_builder *c_builder;                 // The builder.
 };
 
 
