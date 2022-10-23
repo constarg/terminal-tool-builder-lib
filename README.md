@@ -35,4 +35,4 @@ https://cmake.org/download/
 After this the program will be installed and ready to run.
 
 # Documentation
-The documentatioin of the library can be found in the wiki!!
+The documentation of the library can be found in the wiki!!
