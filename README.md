@@ -12,7 +12,7 @@ sudo apt-get install build-essential cmake git gcc
 First download the program from GitHub and go to the terminal-tool-builder-lib folder.
 
 ```
-% git clone https://github.com/rounnus/terminal-tool-builder-lib.git
+% git clone https://github.com/EmbeddedCat/terminal-tool-builder-lib.git
 % cd terminal-tool-builder-lib/
 ```
 
