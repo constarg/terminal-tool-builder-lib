@@ -36,3 +36,8 @@ After this the program will be installed and ready to run.
 
 # Documentation
 The documentation of the library can be found in the wiki!!
+
+# Contributors
+<a href="https://github.com/EmbeddedCat/terminal-tool-builder-lib/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=EmbeddedCat/terminal-tool-builder-lib" />
+</a>
