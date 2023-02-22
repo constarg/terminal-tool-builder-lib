@@ -10,13 +10,12 @@
 #define TOOL_BUILDER_WRONG_ARG_NUM              -1
 #define TOOL_BUILDER_WRONG_NAME_OR_ALIAS        -2
 
-#define TOOL_BUILDER_EMPTY_NAME	                -3
+#define TOOL_BUILDER_EMPTY_NAME                 -3
 
-#define TOOL_BUILDER_NO_ACTION_DEFINED	        -4
+#define TOOL_BUILDER_NO_ACTION_DEFINED          -4
 #define TOOL_BUILDER_FAILED_TO_ADD              -5
 
-#define TOOL_BUILDER_NO_SUCH_COMMAND_EXISTS	-7
-
+#define TOOL_BUILDER_NO_SUCH_COMMAND_EXISTS     -7
 
 
 struct tool_builder_c_help;                         // command help
@@ -24,11 +23,11 @@ struct tool_builder_command;
 
 struct tool_builder_help
 {
-        char *t_usage_sec;                          // The useage section. example: Usage: tool_name [OPTION]...
-        char *t_description;                        // The description of the help.
-        struct tool_builder_c_help *t_commands;     // The commands of the help.
-        char *t_close_description;                  // The closure description.
-        int t_commandsc;                            // The number of commands in help.
+    char *t_usage_sec;                          // The useage section. example: Usage: tool_name [OPTION]...
+    char *t_description;                        // The description of the help.
+    struct tool_builder_c_help *t_commands;     // The commands of the help.
+    char *t_close_description;                  // The closure description.
+    int t_commandsc;                            // The number of commands in help.
 };
 
 
@@ -37,12 +36,12 @@ struct tool_builder_help
 	It contains all the necessary information for the construction 
 	of the requested tool.
 */
-struct tool_builder 
+struct tool_builder
 {
-	struct tool_builder_command *t_commands;        // array of commands.
-	int t_commandsc;                                // The number of the commands.
-	struct tool_builder_help t_help;                // The help of the tool.
-	int t_mc: 1;                                    // enable or disable multiple commands in one line.
+    struct tool_builder_command *t_commands;        // array of commands.
+    int t_commandsc;                                // The number of the commands.
+    struct tool_builder_help t_help;                // The help of the tool.
+    int t_mc: 1;                                    // enable or disable multiple commands in one line.
 };
 
 /**
@@ -51,18 +50,17 @@ struct tool_builder
 	user (tool developer) receives the necessary information about 
 	the command that was executed.
 */
-struct tool_builder_args 
+struct tool_builder_args
 {
-	char *c_name;                                   // The name of the command that has been executed.
-	char *c_used_alias;                             // The alias that has been used.
-	char *(*c_values);                              // The values that the been retrieved. Must be freed when there is no more use.
-	int c_argc;                                     // The arguments of the command.
-	struct tool_builder *c_builder;                 // The builder.
+    char *c_name;                                   // The name of the command that has been executed.
+    char *c_used_alias;                             // The alias that has been used.
+    char *(*c_values);                              // The values that the been retrieved. Must be freed when there is no more use.
+    int c_argc;                                     // The arguments of the command.
+    struct tool_builder *c_builder;                 // The builder.
 };
 
 
-
-/**	
+/**
 	The tool_builder_init function initializes the tool builder.
  
 	@param c_builder Is a pointer to the builder to be used.
@@ -185,7 +183,7 @@ extern int tool_builder_set_closing_desc(struct tool_builder *c_builder, const c
 	all the erros are defined as MACROS.
 
 */
-extern int tool_builder_add_command(struct tool_builder *c_builder, const char *c_name, 
+extern int tool_builder_add_command(struct tool_builder *c_builder, const char *c_name,
                                     int c_argc, void (*c_callback)(const struct tool_builder_args *info));
 
 
@@ -222,7 +220,7 @@ extern int tool_builder_add_alias(struct tool_builder *c_builder, const char *c_
 	all the erros are defined as MACROS.
 	
 */
-extern int tool_builder_set_action(struct tool_builder *c_builder, const char *c_name, 
+extern int tool_builder_set_action(struct tool_builder *c_builder, const char *c_name,
                                    void (*c_callback)(const struct tool_builder_args *info));
 
 
@@ -278,7 +276,7 @@ extern int tool_builder_call_command(const char *c_name, const struct tool_build
 */
 static void inline tool_builder_set_mc(struct tool_builder *c_builder, int state)
 {
-	c_builder->t_mc = state & 0x01;
+    c_builder->t_mc = state & 0x01;
 }
 
 
@@ -308,16 +306,16 @@ static int inline tool_builder_add_both(struct tool_builder *c_builder, const ch
                                         int c_argc, void (*c_callback)(const struct tool_builder_args *info),
                                         const char *c_description)
 {
-	
-	int error = tool_builder_add_command(
-		c_builder,
-		c_name,
-		c_argc,
-		c_callback
-	);
-	if (error != 0) return error;
 
-	return tool_builder_add_command_doc(
+    int error = tool_builder_add_command(
+            c_builder,
+            c_name,
+            c_argc,
+            c_callback
+    );
+    if (error != 0) return error;
+
+    return tool_builder_add_command_doc(
             c_builder,
             c_name,
             c_description
@@ -340,19 +338,19 @@ static int inline tool_builder_add_both(struct tool_builder *c_builder, const ch
 
 	all the erros are defined as MACROS.
 */
-static int inline tool_builder_add_alias_both(struct tool_builder *c_builder, const char *c_name, 
+static int inline tool_builder_add_alias_both(struct tool_builder *c_builder, const char *c_name,
                                               const char *c_alias, ...)
 {
-	
-	int error = tool_builder_add_alias(
-		c_builder,
-		c_name,
-		c_alias
-	);
-	if (error != 0) return error;
-	
 
-	return tool_builder_add_alias_doc(
+    int error = tool_builder_add_alias(
+            c_builder,
+            c_name,
+            c_alias
+    );
+    if (error != 0) return error;
+
+
+    return tool_builder_add_alias_doc(
             c_builder,
             c_name
     );
