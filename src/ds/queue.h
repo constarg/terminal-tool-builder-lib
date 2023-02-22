@@ -7,49 +7,49 @@
 // node data.
 struct tb_queue_node_d
 {
-	struct tool_builder_args c_args;
-	void (*c_callback)(const struct tool_builder_args *info);	
+    struct tool_builder_args c_args;
+
+    void (*c_callback)(const struct tool_builder_args *info);
 };
 
 // queue node.
-struct tb_queue_node 
+struct tb_queue_node
 {
-	// data
-	struct tb_queue_node_d data;
-	// link to next node.
-	struct tb_queue_node *next;
+    // data
+    struct tb_queue_node_d data;
+    // link to next node.
+    struct tb_queue_node *next;
 };
 
 // queue.
-struct tb_queue 
+struct tb_queue
 {
-	struct tb_queue_node *front; // the first element of queue.
-	struct tb_queue_node *rear;  // the last element of queue.
+    struct tb_queue_node *front; // the first element of queue.
+    struct tb_queue_node *rear;  // the last element of queue.
 };
 
 
 static inline void tb_queue_init(struct tb_queue *queue)
 {
-	memset(queue, 0x0, sizeof(struct tb_queue));
+    memset(queue, 0x0, sizeof(struct tb_queue));
 }
 
 static inline void tb_queue_destroy(struct tb_queue *queue)
 {
-	if (queue->front == NULL) return;
-	struct tb_queue_node *tmp = queue->front->next;
-	while(tmp)
-	{
-		free(queue->front->data.c_args.c_values);
-		free(queue->front);
-		queue->front = tmp;
-		tmp = queue->front->next;
-	}
-	memset(queue, 0x0, sizeof(struct tb_queue));
+    if (queue->front == NULL) return;
+    struct tb_queue_node *tmp = queue->front->next;
+    while (tmp) {
+        free(queue->front->data.c_args.c_values);
+        free(queue->front);
+        queue->front = tmp;
+        tmp = queue->front->next;
+    }
+    memset(queue, 0x0, sizeof(struct tb_queue));
 }
 
 static inline int tb_queue_is_empty(struct tb_queue *queue)
 {
-	return (queue->front == NULL)? 0x1 : 0x0;
+    return (queue->front == NULL) ? 0x1 : 0x0;
 }
 
 /**
@@ -67,13 +67,13 @@ extern void tb_queue_enqueue(struct tb_queue_node_d *src, struct tb_queue *queue
 */
 static inline void tb_queue_dequeue(struct tb_queue_node_d *dst, struct tb_queue *queue)
 {
-	if (queue->front == NULL) return;
+    if (queue->front == NULL) return;
 
-	memcpy(dst, &queue->front->data, sizeof(struct tb_queue_node_d));	
-	struct tb_queue_node *removed = queue->front;
-	queue->front = queue->front->next;
+    memcpy(dst, &queue->front->data, sizeof(struct tb_queue_node_d));
+    struct tb_queue_node *removed = queue->front;
+    queue->front = queue->front->next;
 
-	free(removed);
+    free(removed);
 }
 
 
